@@ -459,7 +459,7 @@ const teamOf=r=>TEAM.village.includes(r)?'市民陣営':TEAM.wolf.includes(r)?'�
 const wcol=c=>'hsl('+((c||0)*47%360)+' 65% 62%)';
 const roleLi=ks=>ks.map(k=>'<li><b>'+RN[k]+'</b>（'+teamOf(k)+'）'+RD[k]+'</li>').join('');
 const CHATLI='<li>昼のチャットは全員に届き、話した人の顔や吹き出しが動きます。夜のチャットは人狼同士だけ、死者のチャットは死者同士だけに届きます。人狼は昼でも「人狼のみ」を選んで仲間にだけ話せます（そのときは顔や吹き出しは出ません）。</li><li>議論中は、各自1回だけ匿名で<b>議論時間の延長</b>を申請できます。申請は全員に通知され、生存者の過半数が賛成すると3分延長されます（申請者は賛成扱い）。延長は1日に1回まで。延長が受理された日も、否決された日も、次の議論になるまで再申請できません。</li>';
-$('#rl-wolf').innerHTML='<ol><li>4〜20人で遊べます。人数ごとに「市民陣営と人狼陣営の枚数」が決まっていて、人狼陣営の数は基本固定です。ホストは役職市民（占い師・霊媒師・狩人・共有者・村長）を外したり戻したりでき、外した分は素の市民が増えます（素の市民は定められた人数を下回りません）。役職市民は各1人まで（共有者だけ2人1組）です。参加人数が8人以上の偶数のときは第三陣営（吊り人・ブタ男）を入れられ（8人は吊り人のみ、10・12・14人はどちらか1つ、16人以上は最大2体）、入れた分だけ素の市民が減ります。配役の内訳は参加者全員が見られます。</li><li>流れ：夜（役職の行動）→朝（襲撃結果の発表）→昼（チャットで議論）→投票（最多票が処刑。同数なら1回だけ決選投票）を、決着がつくまで繰り返します。<b>人狼の襲撃は第2夜からで、第1夜は誰も襲撃されません</b>（占い師などの行動は第1夜から使えますが、狩人の護衛も第2夜からです）。処刑や襲撃の結果は、全員の画面で演出のあとに発表されます。</li><li>勝利条件：市民陣営は人狼の全滅、人狼陣営は人狼の数が人間以上になること。第三陣営は各自の条件を満たした時点で単独勝利し、ゲームが終わります。</li>'+CHATLI+'</ol><div style="font-size:13px"><b>役職一覧</b></div><ol>'+roleLi(Object.keys(RN).filter(k=>k!=='robber'))+'</ol>';
+$('#rl-wolf').innerHTML='<ol><li>4〜20人で遊べます。人数ごとに「市民陣営と人狼陣営の枚数」が決まっていて、人狼陣営の数は基本固定です。ホストは役職市民（占い師・霊媒師・狩人・共有者・村長）を外したり戻したりでき、外した分は素の市民が増えます（素の市民は定められた人数を下回りません）。役職市民は各1人まで（共有者だけ2人1組）です。参加人数が8人以上の偶数のときは第三陣営（吊り人・ブタ男）を入れられ（8人は吊り人のみ、10・12・14人はどちらか1つ、16人以上は最大2体）、入れた分だけ素の市民が減ります。配役の内訳は参加者全員が見られます。</li><li>流れ：夜（役職の行動）→朝（襲撃結果の発表）→昼（チャットで議論）→投票（最多票が処刑。同数なら1回だけ決選投票）を、決着がつくまで繰り返します。<b>人狼の襲撃は第2夜からで、第1夜は誰も襲撃されません</b>（占い師などの行動は第1夜から使えますが、狩人の護衛も第2夜からです）。処刑や襲撃の結果は、全員の画面で演出のあとに発表されます。投票結果（誰が誰に投票したか）を公開するかどうかは、ホストがゲーム開始前に選べます（ゲーム中は変更できません）。</li><li>勝利条件：市民陣営は人狼の全滅、人狼陣営は人狼の数が人間以上になること。第三陣営は各自の条件を満たした時点で単独勝利し、ゲームが終わります。</li>'+CHATLI+'</ol><div style="font-size:13px"><b>役職一覧</b></div><ol>'+roleLi(Object.keys(RN).filter(k=>k!=='robber'))+'</ol>';
 $('#rl-one').innerHTML='<ol><li>3〜6人で遊べます。カードは「人数＋2枚」で、2枚は誰にも配られない場札です。配役は固定で、3人＝市民1・占い師1・怪盗1・人狼2、4人＝市民2・占い師1・怪盗1・人狼2、5人＝市民3・占い師1・怪盗1・人狼2、6人＝市民4・占い師1・怪盗1・人狼2です。内訳は参加者全員が見られます。</li><li>夜は一度だけです。占い師は1人を占い、怪盗は1人を選んでお互いの役職カードを交換し（交換された人は気づきません）自分の新しい役職を知り、人狼は仲間を確認します。全員が行動またはOKを押すと朝になります。</li><li>昼は議論（チャット）のあと投票します。処刑する人のほかに、「🕊 平和村（人狼はいない）」にも投票できます。2票以上入った人が処刑されますが、平和村が同じ数以上の票を集めたときと、全員が1票以下のときは、誰も処刑されません。</li><li>勝敗は、怪盗の交換を反映した最終的な役職で決まります。人狼を処刑できれば市民陣営の勝ち、逃せば人狼陣営の勝ちです。人狼が全員場札にいる「平和村」では、誰も処刑しなければ市民陣営の勝ち、誰かを処刑すると市民陣営の負けです。</li>'+CHATLI+'</ol><div style="font-size:13px"><b>使える役職</b></div><ol>'+roleLi(ORDER1.concat(['villager']))+'</ol>';
 let chatSubs={},chatData={},myChat=[],lastT={},chMode='all';
 let cview=null,cviewKey='',unread={pub:0,priv:0};
@@ -500,7 +500,7 @@ function wsay(text){const m=S.players.find(p=>p.id===me);if(!m)return;let ch='al
  db.doc(cdoc(me)).set({m:myChat}).catch(()=>{});chatData[me]=myChat;renderChat()}
 function ib(s,id,t){(s.inbox[id]=s.inbox[id]||[]).push(t)}
 function rl(s,t){s.log.push(t);if(s.log.length>80)s.log.splice(0,s.log.length-80)}
-function newWolf(c,mode){return{code:c,game:'wolf',mode:mode||'normal',host:me,phase:'lobby',players:[mk(0)],log:[],inbox:{},act:{},votes:{},gid:1,extUsed:{},ext:null,extSec:0,extDay:0,extN:0,cfg:{how:'rec',mani:false,dayMin:3,counts:fullCounts(recCounts(mode==='one'?3:4,mode==='one'))}}}
+function newWolf(c,mode){return{code:c,game:'wolf',mode:mode||'normal',host:me,phase:'lobby',players:[mk(0)],log:[],inbox:{},act:{},votes:{},gid:1,extUsed:{},ext:null,extSec:0,extDay:0,extN:0,cfg:{how:'rec',mani:false,showVotes:true,dayMin:3,counts:fullCounts(recCounts(mode==='one'?3:4,mode==='one'))}}}
 const wTotal=(s,N)=>s.mode==='one'?N+2:N;
 function wCounts(s,N){return s.mode==='one'?recCounts(N,true):compose(N,s.cfg).c}
 function wCheck(s){const one=s.mode==='one',N=s.players.filter(p=>!p.left).length,min=one?3:4,mx=one?6:20;
@@ -516,7 +516,7 @@ function randCounts(N,one){const c={};
  let slots=Math.max(1,Math.min(V-1,Math.round(V*.6)));
  for(const k of shuffle(['seer','medium','hunter','mayor','cowner'])){const n=k==='cowner'?2:1;if(slots>=n){c[k]=n;slots-=n}}
  return c}
-function wcfg(k,v){selfEdit=Date.now();act(s=>{if(s.host!==me||s.phase!=='lobby')return false;if(k==='mani')s.cfg.mani=!!v;else if(k==='dayMin')s.cfg.dayMin=v})}
+function wcfg(k,v){selfEdit=Date.now();act(s=>{if(s.host!==me||s.phase!=='lobby')return false;if(k==='mani')s.cfg.mani=!!v;else if(k==='votes')s.cfg.showVotes=!!v;else if(k==='dayMin')s.cfg.dayMin=v})}
 function wstart(){act(s=>{if(s.game!=='wolf'||s.host!==me||s.phase!=='lobby'||wCheck(s))return false;
  const ps=s.players.filter(p=>!p.left),N=ps.length,one=s.mode==='one',total=one?N+2:N;
  const c=wCounts(s,N);
@@ -554,7 +554,7 @@ function toDayOne(s){s.players.forEach(p=>{p.fin=p.role});
  s.players.filter(p=>p.alive&&p.role==='robber'&&s.act[p.id]&&s.act[p.id].t).forEach(r=>{const tp=s.players.find(q=>q.id===s.act[r.id].t);if(!tp)return;const nr=tp.fin;tp.fin=r.fin;r.fin=nr;ib(s,r.id,'🕵️ '+tp.name+' と役職を交換しました。あなたの新しい役職は「'+RN[nr]+'」です')});
  toDay(s);rl(s,'夜が明けました。議論の後に投票してください（2票以上入った人が処刑されます）')}
 function tally(s,pool){const c={};s.players.filter(p=>p.alive).forEach(p=>{const t=s.votes[p.id];if(t&&t!=='abstain'&&(!pool||pool.includes(t)))c[t]=(c[t]||0)+(p.role==='mayor'?2:1)});return c}
-function voteLine(s){rl(s,'投票：'+(s.players.filter(p=>p.alive&&s.votes[p.id]&&s.votes[p.id]!=='abstain').map(p=>p.name+'→'+(s.votes[p.id]==='peace'?'平和村':s.players.find(q=>q.id===s.votes[p.id]).name)).join('、')||'なし'))}
+function voteLine(s){if(s.cfg&&s.cfg.showVotes===false){rl(s,'投票：投票内容は非公開に設定されています');return}rl(s,'投票：'+(s.players.filter(p=>p.alive&&s.votes[p.id]&&s.votes[p.id]!=='abstain').map(p=>p.name+'→'+(s.votes[p.id]==='peace'?'平和村':s.players.find(q=>q.id===s.votes[p.id]).name)).join('、')||'なし'))}
 function afterExec(s,ex){if(ex&&ex.role==='hanged')return endGame(s,'single',[ex.id],'吊り人が処刑され、吊り人の単独勝利！');const w=checkWin(s);if(w)return endGame(s,w);toNight(s)}
 function resolveVote(s){voteLine(s);const c=tally(s,s.cands),mx=Math.max(0,...Object.values(c));
  if(!mx){rl(s,'誰も処刑されませんでした');evPush(s,'exec',[]);return afterExec(s,null)}
@@ -626,12 +626,12 @@ function renderWolf(){syncChat();
   <div class="box"><div class="wg">${live.map(wav).join('')}</div><div class="sm" style="text-align:center;margin-top:8px;font-size:14px">参加 ${N}/${mx}人（${mn}人以上で開始できます）</div></div>`;
   const day=host?`議論時間 <select onchange="wcfg('dayMin',+this.value)">${[1,2,3,5,7,10].map(m=>`<option value="${m}" ${cfg.dayMin===m?'selected':''}>${m}分</option>`).join('')}</select>`:`議論時間：${cfg.dayMin}分`;
   h+=compBox(N,one,host,day);
-  h+=`<div class="box row" style="justify-content:center"><button onclick="showRoles()">📋 役職一覧</button>${maniSw()}${host?`<button class="p" ${err?'disabled':''} onclick="wstart()">ゲーム開始</button>${err?'<span class="sm">'+err+'</span>':''}`:'<span class="sm">ホストの開始を待っています…</span>'}</div>`;
+  h+=`<div class="box row" style="justify-content:center"><button onclick="showRoles()">📋 役職一覧</button>${maniSw()}${voteSw()}${host?`<button class="p" ${err?'disabled':''} onclick="wstart()">ゲーム開始</button>${err?'<span class="sm">'+err+'</span>':''}`:'<span class="sm">ホストの開始を待っています…</span>'}</div>`;
  }else{
   const lab={night:'🌙 第'+S.day+'夜',day:'☀️ 第'+S.day+'日・議論',vote:'🗳 投票',end:'🏁 終了'}[ph];
   h+=`<div class="box" style="text-align:center"><div class="big" style="margin:0"><b>${lab}</b>${ph==='day'?' ⏱ <b id="wtimer">'+wfmt(wRemain())+'</b>':''}</div><div class="sm">${S.mode==='one'?'ワンナイト人狼':'人狼'}${S.mode==='one'?'（場札2枚は未配布）':''}</div></div>`;
   {const rk=code+':'+S.gid;if(rcKey!==rk){rcKey=rk;roleUp=false}}
-  if(mp&&mp.role)h+=`<div class="box row" style="align-items:center;flex-wrap:nowrap"><div onclick="toggleRole(this)" style="cursor:pointer;flex:none">${roleCard(mp.role,roleUp,false,'mini')}</div><div style="flex:1;min-width:0">${roleUp?`<div class="sm">あなたの役職（${teamOf(mp.role)}）</div><div class="tg" style="font-size:26px">${RN[mp.role]}</div><div class="sm" style="font-size:13px">${RD[mp.role]}</div>`:`<div class="sm">あなたの役職カード（裏向き）</div><div style="font-size:16px;font-weight:700;margin:4px 0">カードをタップすると表になります</div><div class="sm">もう一度タップすると裏向きに戻ります</div>`}<div class="row" style="margin-top:6px"><button onclick="showRoles()">📋 役職一覧</button>${maniSw()}</div></div></div>`;
+  if(mp&&mp.role)h+=`<div class="box row" style="align-items:center;flex-wrap:nowrap"><div onclick="toggleRole(this)" style="cursor:pointer;flex:none">${roleCard(mp.role,roleUp,false,'mini')}</div><div style="flex:1;min-width:0">${roleUp?`<div class="sm">あなたの役職（${teamOf(mp.role)}）</div><div class="tg" style="font-size:26px">${RN[mp.role]}</div><div class="sm" style="font-size:13px">${RD[mp.role]}</div>`:`<div class="sm">あなたの役職カード（裏向き）</div><div style="font-size:16px;font-weight:700;margin:4px 0">カードをタップすると表になります</div><div class="sm">もう一度タップすると裏向きに戻ります</div>`}<div class="row" style="margin-top:6px"><button onclick="showRoles()">📋 役職一覧</button>${maniSw()}${voteSw()}</div></div></div>`;
   const ibx=S.inbox&&S.inbox[me];if(ibx&&ibx.length)h+=`<div class="box"><b>📩 あなたへの情報</b>${ibx.map(x=>'<div class="sm" style="font-size:14px;color:var(--fg);margin-top:4px">'+esc(x)+'</div>').join('')}</div>`;
   h+=`<div class="box"><div class="wg">${live.map(wav).join('')}</div></div>`;
   if(mp&&mp.alive){if(ph==='night')h+=nightPanel(mp);else if(ph==='day')h+=dayPanel(host);else if(ph==='vote')h+=votePanel()}
@@ -690,6 +690,9 @@ function showMemo(){let v='';try{v=localStorage.getItem(mkey())||''}catch(e){}$(
  lockY=window.scrollY||0;const b=document.body;b.style.position='fixed';b.style.top=-lockY+'px';b.style.width='100%';$('#memo').style.display='flex'}
 function closeMemo(){saveMemo();$('#memo').style.display='none';const b=document.body;b.style.position='';b.style.top='';b.style.width='';window.scrollTo(0,lockY)}
 function maniSw(){const host=S.host===me,dis=!host||S.phase!=='lobby',on=maniOn();return`<button type="button" class="swb ${on?'on':''}" role="switch" aria-checked="${on}" ${dis?'disabled':''} title="${host?(S.phase==='lobby'?'マニ画像に切り替えます':'ゲーム中は変更できません'):'ルーム作成者のみ変更できます'}" onclick="maniToggle()"><span class="trk"></span><span>マニ搭載</span><b>${on?'ON':'OFF'}</b></button>`}
+const votesOn=()=>!(S&&S.cfg&&S.cfg.showVotes===false);
+function voteSw(){const host=S.host===me,dis=!host||S.phase!=='lobby',on=votesOn();return`<button type="button" class="swb ${on?'on':''}" role="switch" aria-checked="${on}" ${dis?'disabled':''} title="${host?(S.phase==='lobby'?'投票結果（誰が誰に投票したか）をログに表示するか選びます':'ゲーム中は変更できません'):'ルーム作成者のみ変更できます'}" onclick="voteToggle()"><span class="trk"></span><span>投票結果を公開</span><b>${on?'ON':'OFF'}</b></button>`}
+function voteToggle(){selfEdit=Date.now();if(!S||S.host!==me||S.phase!=='lobby')return;const v=!votesOn();S.cfg.showVotes=v;render();wcfg('votes',v)}
 function maniToggle(){selfEdit=Date.now();if(!S||S.host!==me||S.phase!=='lobby')return;const v=!maniOn();S.cfg.mani=v;render();wcfg('mani',v)}
 function showRole(k){rdKey=k;$('#roledetail').innerHTML=rdHTML=roleDetailHTML(k);$('#roledetail').style.display='flex'}
 
