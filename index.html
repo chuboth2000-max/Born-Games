@@ -154,9 +154,37 @@ textarea{font:inherit;padding:9px 10px;border-radius:8px;border:1px solid var(--
 #evl .evfl{position:absolute;left:0;top:0;right:0;bottom:0;background:#e11;opacity:0;pointer-events:none;animation:evfl .9s both}
 @keyframes evfl{0%{opacity:0}20%{opacity:.6}100%{opacity:0}}
 @media(prefers-reduced-motion:reduce){#evl .evw.shk{animation:none}#evl .evfl{display:none}}
+
+/* ===== ファイル選択ボタン ===== */
+.fbtn{display:flex;align-items:center;justify-content:center;flex:1 1 0;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ===== スマホ：右側のチャット／ログ切り替えパネル ===== */
+#sdt,#sdr{display:none}
+@media(max-width:860px){
+ .wrap{grid-template-columns:minmax(0,1fr)}
+ body.inroom main{padding-right:34px}
+ body.inroom #sdt{display:flex}
+ body.inroom #sdr{display:flex}
+ #sdt{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:34;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 6px;border:1px solid var(--acc);border-right:0;border-radius:12px 0 0 12px;background:var(--acc);color:#fff;font-size:13px;font-weight:700;box-shadow:-2px 2px 8px rgba(0,0,0,.25)}
+ #sdt .vt{writing-mode:vertical-rl;letter-spacing:.15em;white-space:nowrap}
+ #sdt .bd{background:#fff;color:var(--acc);margin:0}
+ #sdr{position:fixed;top:calc(env(safe-area-inset-top,0px) + 54px);right:0;bottom:0;width:min(88vw,360px);z-index:36;flex-direction:column;background:var(--card);border:1px solid var(--line);border-right:0;border-radius:14px 0 0 0;box-shadow:-8px 0 24px rgba(0,0,0,.3);transform:translateX(105%);visibility:hidden;transition:transform .25s,visibility 0s .25s;padding-bottom:env(safe-area-inset-bottom,0px)}
+ #sdr.open{transform:none;visibility:visible;transition:transform .25s}
+ #sdr .sdh{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--line)}
+ #sdr .sdh button{flex:1;padding:8px 6px;font-size:14px;white-space:nowrap}
+ #sdr .sdh button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+ #sdr .sdh button.x{flex:none;padding:8px 12px}
+ #sdb{flex:1;min-height:0;display:flex;flex-direction:column}
+ #sdb .side{display:flex;flex-direction:column;flex:1;min-height:0;margin:0;border:0;border-radius:0;background:transparent;padding:10px}
+ #sdb .slog{flex:1;min-height:0;max-height:none;font-size:14px}
+ #sdr.tc #lcol{display:none!important}
+ #sdr.tl #rcol{display:none!important}
+ #rcol #chsel,#rcol #cin{flex:none}
+}
 </style></head><body><main><h1 style="display:flex;align-items:center;gap:10px"><span id="ttl">🎲 ゲームルーム</span> <button onclick="showRules()" style="font-size:13px">📖 ルール</button></h1><div class="wrap"><aside id="lcol" class="box side" style="display:none"><b>📜 ラウンドログ</b><div id="glog" class="slog"></div></aside><div id="center"><div id="app"></div>
 <div id="bar" class="box" style="display:none"><div class="emo row" style="justify-content:center"><button onclick="emote('shake')">🙅 首振り</button><button onclick="emote('nod')">🙆 うなずき</button><span id="emos" class="row"></span></div>
-<div id="chsel" class="row" style="margin-top:8px;display:none"></div><div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="ct" maxlength="40" placeholder="メッセージ（頭の上に吹き出しで表示）" style="flex:1;margin:0;width:auto" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229)sendChat()"><button class="p" onclick="sendChat()">送信</button></div></div></div><aside id="rcol" class="box side" style="display:none"><b>💬 チャット</b><div id="cview" class="row" style="display:none;gap:4px;margin:6px 0 0"></div><div id="clog" class="slog"></div></aside></div></main>
+<div id="chsel" class="row" style="margin-top:8px;display:none"></div><div id="cin" class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="ct" maxlength="40" placeholder="メッセージ（頭の上に吹き出しで表示）" style="flex:1;margin:0;width:auto" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229)sendChat()"><button class="p" onclick="sendChat()">送信</button></div></div></div><aside id="rcol" class="box side" style="display:none"><b>💬 チャット</b><div id="cview" class="row" style="display:none;gap:4px;margin:6px 0 0"></div><div id="clog" class="slog"></div></aside></div></main>
+<button id="sdt" onclick="sdToggle(true)" aria-label="チャットとログを開く"></button>
+<div id="sdr"><div class="sdh"><button id="sdt1" onclick="sdTab('c')"></button><button id="sdt2" onclick="sdTab('l')"></button><button class="x" onclick="sdToggle(false)" aria-label="閉じる">✕</button></div><div id="sdb"></div></div>
 <div id="tb" style="display:none"><button id="memob" onclick="showMemo()">📝 メモ</button><button id="lvb" onclick="askLeave()">🚪 退出</button></div><div id="lvc" class="ov" style="display:none"><div class="box"><p id="lvt" style="font-size:17px;font-weight:700;margin:0 0 6px"></p><div id="lvs" class="sm" style="margin-bottom:12px;font-size:14px"></div><div class="row" style="justify-content:center"><button class="p" onclick="lvYes()">はい</button><button onclick="lv=false;render()">いいえ</button></div></div></div><div id="rcard" class="ov" style="display:none;z-index:45;flex-direction:column"></div><div id="rolelist" class="ov" style="display:none;z-index:45" onclick="if(event.target===this)this.style.display='none'"></div><div id="roledetail" class="ov" style="display:none;z-index:55" onclick="if(event.target===this)this.style.display='none'"></div><div id="memo" class="ov" style="display:none;z-index:60;overscroll-behavior:contain"><div class="box" style="max-width:640px;width:100%;text-align:left;margin:0"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b style="font-size:18px">📝 メモ（自分だけに表示）</b><button class="p" onclick="closeMemo()">閉じる</button></div><textarea id="memot" style="width:100%;height:min(60vh,520px);resize:vertical;margin:8px 0 4px;font-size:16px;line-height:1.5" placeholder="気づいたことを自由に書いてください（文字数の上限はありません）" oninput="saveMemo()"></textarea><div class="sm">このメモはあなたの端末にだけ保存され、他の人には見えません。</div></div></div><div id="toast" style="display:none"></div><div id="ovl"></div><div id="evl" style="display:none"></div>
 <div id="rules" class="ov" style="display:none" onclick="if(event.target===this)this.style.display='none'"><div class="box" style="text-align:left;max-height:85vh;overflow:auto"><b style="font-size:18px">📖 ルール</b>
 <div id="rl-liar"><ol><li>2〜4人で遊びます。デッキはQ・K・Aが各6枚＋ジョーカー2枚の計20枚。各自に5枚ずつ配られます。</li>
@@ -307,6 +335,36 @@ function evClose(){
  if(S&&S.game==='wolf'&&S.phase==='day'&&evKind==='night')phaseStart=Date.now();
  render();evPump()}
 
+
+/* ===== スマホ：右側のチャット／ログ切り替えパネル ===== */
+const sdMq=window.matchMedia('(max-width:860px)');
+let sdOpen=false,sdTabK='c',sdU={c:0,l:0},sdLast={c:null,l:null},sdIn=false,sdT0=0;
+function sdLayout(){
+ const w=$('.wrap'),l=$('#lcol'),r=$('#rcol'),c=$('#center'),b=$('#bar'),cs=$('#chsel'),ci=$('#cin'),body=$('#sdb');
+ if(!w||!body||!l||!r||!c||!b)return;
+ if(sdMq.matches){body.appendChild(l);body.appendChild(r);r.appendChild(cs);r.appendChild(ci)}
+ else{w.insertBefore(l,c);w.appendChild(r);b.appendChild(cs);b.appendChild(ci);sdOpen=false}
+ sdApply()}
+function sdApply(){
+ const d=$('#sdr');if(!d)return;
+ d.classList.toggle('open',sdOpen);d.classList.toggle('tc',sdTabK==='c');d.classList.toggle('tl',sdTabK==='l');
+ if(sdOpen)sdU[sdTabK]=0;
+ const bd=n=>n?'<span class="bd">'+(n>9?'9+':n)+'</span>':'';
+ $('#sdt1').classList.toggle('on',sdTabK==='c');$('#sdt2').classList.toggle('on',sdTabK==='l');
+ $('#sdt1').innerHTML='💬 チャット'+bd(sdU.c);$('#sdt2').innerHTML='📜 ログ'+bd(sdU.l);
+ $('#sdt').innerHTML='<span class="vt">💬 チャット・ログ</span>'+bd(sdU.c+sdU.l)}
+function sdBottom(){setTimeout(()=>{['#glog','#clog'].forEach(s=>{const e=$(s);if(e)e.scrollTop=e.scrollHeight})},30)}
+function sdToggle(f){sdOpen=f===undefined?!sdOpen:!!f;sdApply();if(sdOpen)sdBottom()}
+function sdTab(k){sdTabK=k;sdApply();sdBottom()}
+function sdRoom(inRoom){if(inRoom!==sdIn){sdIn=inRoom;sdT0=Date.now();if(!inRoom){sdOpen=false;sdU={c:0,l:0};sdApply()}}}
+function sdWatch(id,k){const e=$(id);if(!e)return;
+ new MutationObserver(()=>{const x=e.lastElementChild,s=x?x.textContent:'';
+  if(sdLast[k]!==null&&s&&s!==sdLast[k]&&sdIn&&sdMq.matches&&Date.now()-sdT0>2500&&!(sdOpen&&sdTabK===k)){sdU[k]++;sdApply()}
+  sdLast[k]=s}).observe(e,{childList:true})}
+sdWatch('#clog','c');sdWatch('#glog','l');
+if(sdMq.addEventListener)sdMq.addEventListener('change',sdLayout);else sdMq.addListener(sdLayout);
+sdLayout();
+
 function endBtns(){return`<div class="row" style="justify-content:center;margin-top:10px">${S.host===me?'<button class="p" onclick="lobby()">ロビーへ戻る</button>':'<span class="sm">ホストがロビーに戻します</span>'}</div>`}
 function TL(r){const n=r.cards.length,T1=.4+n*.7+.4,T2=T1+1.2,T3=T2+1.8,T4=T3+.8;return{T1,T2,T3,T4,end:T4+2.5}}
 function ovHTML(){
@@ -342,7 +400,7 @@ function next(t){act(s=>{if(s.phase!=='reveal'||!s.rev||s.rev.t!==t)return false
  s.log=(s.log||[]).concat(r.forced?r.lname+' は最後の1人としてトリガーを引き、'+(r.died?'💥脱落':'セーフ'):r.caller+' の「嘘だ！」→'+(r.truth?'本当':'嘘')+'。'+r.lname+' は'+(r.died?'💥脱落':'セーフ'));s.players=shuffle(s.players.filter(p=>p.alive)).concat(s.players.filter(p=>!p.alive));deal(s,0)})}
 
 const RN={villager:'市民',robber:'怪盗',seer:'占い師',medium:'霊媒師',hunter:'狩人',mayor:'村長',cowner:'共有者',wolf:'人狼',madman:'狂人',sage:'賢狼',able:'能ある人狼',hanged:'吊り人',pig:'ブタ男'};
-const RD={villager:'特別な能力はありません。推理と発言で人狼を探します。',robber:'夜に自分以外の1人を選び、その人と役職カードを交換して自分の新しい役職を知ります（交換された人は気づきません）。',seer:'毎夜、1人を選んで「人間か人狼か」を知れます。',medium:'昼に処刑された人が「人間か人狼か」を知れます。',hunter:'毎夜、自分以外の1人を人狼の襲撃から護衛します。',mayor:'昼の投票で、あなたの1票は2票分として数えられます。',cowner:'2人1組で、お互いが人間であることを最初から知っています。',wolf:'夜に1人を襲撃できます（襲撃は第2夜から。第1夜は襲撃できません）。人狼同士は夜に会話できます。',madman:'占い・霊媒では「人間」と判定されます。人狼陣営ですが特殊能力はありません。',sage:'人狼として襲撃でき（第2夜から）、襲撃した相手の役職を知れます。',able:'人狼として襲撃できます（第2夜から）が、夜に「襲撃しない」も選べます。',hanged:'自分が処刑されたら単独勝利です（処刑以外の死亡では勝利になりません）。',pig:'自分が襲撃されて死亡したら単独勝利です（襲撃以外の死亡では勝利になりません）。'};
+const RD={villager:'特別な能力はありません。推理と発言で人狼を探します。',robber:'夜に自分以外の1人を選び、その人と役職カードを交換して自分の新しい役職を知ります（交換された人は気づきません）。',seer:'毎夜、1人を選んで「人間か人狼か」を知れます。',medium:'昼に処刑された人が「人間か人狼か」を知れます。',hunter:'毎夜、自分以外の1人を人狼の襲撃から護衛します（第2夜から。第1夜は襲撃がないため護衛できません）。',mayor:'昼の投票で、あなたの1票は2票分として数えられます。',cowner:'2人1組で、お互いが人間であることを最初から知っています。',wolf:'夜に1人を襲撃できます（襲撃は第2夜から。第1夜は襲撃できません）。人狼同士は夜に会話できます。',madman:'占い・霊媒では「人間」と判定されます。人狼陣営ですが特殊能力はありません。',sage:'人狼として襲撃でき（第2夜から）、襲撃した相手の役職を知れます。',able:'人狼として襲撃できます（第2夜から）が、夜に「襲撃しない」も選べます。',hanged:'自分が処刑されたら単独勝利です（処刑以外の死亡では勝利になりません）。',pig:'自分が襲撃されて死亡したら単独勝利です（襲撃以外の死亡では勝利になりません）。'};
 const WOLF=['wolf','sage','able'],TEAM={village:['villager','robber','seer','medium','hunter','mayor','cowner'],wolf:['wolf','sage','able','madman'],third:['hanged','pig']};
 const ORDER=['wolf','sage','able','madman','seer','medium','hunter','mayor','cowner','hanged','pig'];
 const ORDER1=['wolf','seer','robber'];
@@ -401,7 +459,7 @@ const teamOf=r=>TEAM.village.includes(r)?'市民陣営':TEAM.wolf.includes(r)?'�
 const wcol=c=>'hsl('+((c||0)*47%360)+' 65% 62%)';
 const roleLi=ks=>ks.map(k=>'<li><b>'+RN[k]+'</b>（'+teamOf(k)+'）'+RD[k]+'</li>').join('');
 const CHATLI='<li>昼のチャットは全員に届き、話した人の顔や吹き出しが動きます。夜のチャットは人狼同士だけ、死者のチャットは死者同士だけに届きます。人狼は昼でも「人狼のみ」を選んで仲間にだけ話せます（そのときは顔や吹き出しは出ません）。</li><li>議論中は、各自1回だけ匿名で<b>議論時間の延長</b>を申請できます。申請は全員に通知され、生存者の過半数が賛成すると3分延長されます（申請者は賛成扱い）。延長は1日に1回まで。延長が受理された日も、否決された日も、次の議論になるまで再申請できません。</li>';
-$('#rl-wolf').innerHTML='<ol><li>4〜20人で遊べます。人数ごとに「市民陣営と人狼陣営の枚数」が決まっていて、人狼陣営の数は基本固定です。ホストは役職市民（占い師・霊媒師・狩人・共有者・村長）を外したり戻したりでき、外した分は素の市民が増えます（素の市民は定められた人数を下回りません）。役職市民は各1人まで（共有者だけ2人1組）です。参加人数が8人以上の偶数のときは第三陣営（吊り人・ブタ男）を入れられ（8人は吊り人のみ、10・12・14人はどちらか1つ、16人以上は最大2体）、入れた分だけ素の市民が減ります。配役の内訳は参加者全員が見られます。</li><li>流れ：夜（役職の行動）→朝（襲撃結果の発表）→昼（チャットで議論）→投票（最多票が処刑。同数なら1回だけ決選投票）を、決着がつくまで繰り返します。<b>人狼の襲撃は第2夜からで、第1夜は誰も襲撃されません</b>（占い師などの行動は第1夜から使えます）。処刑や襲撃の結果は、全員の画面で演出のあとに発表されます。</li><li>勝利条件：市民陣営は人狼の全滅、人狼陣営は人狼の数が人間以上になること。第三陣営は各自の条件を満たした時点で単独勝利し、ゲームが終わります。</li>'+CHATLI+'</ol><div style="font-size:13px"><b>役職一覧</b></div><ol>'+roleLi(Object.keys(RN).filter(k=>k!=='robber'))+'</ol>';
+$('#rl-wolf').innerHTML='<ol><li>4〜20人で遊べます。人数ごとに「市民陣営と人狼陣営の枚数」が決まっていて、人狼陣営の数は基本固定です。ホストは役職市民（占い師・霊媒師・狩人・共有者・村長）を外したり戻したりでき、外した分は素の市民が増えます（素の市民は定められた人数を下回りません）。役職市民は各1人まで（共有者だけ2人1組）です。参加人数が8人以上の偶数のときは第三陣営（吊り人・ブタ男）を入れられ（8人は吊り人のみ、10・12・14人はどちらか1つ、16人以上は最大2体）、入れた分だけ素の市民が減ります。配役の内訳は参加者全員が見られます。</li><li>流れ：夜（役職の行動）→朝（襲撃結果の発表）→昼（チャットで議論）→投票（最多票が処刑。同数なら1回だけ決選投票）を、決着がつくまで繰り返します。<b>人狼の襲撃は第2夜からで、第1夜は誰も襲撃されません</b>（占い師などの行動は第1夜から使えますが、狩人の護衛も第2夜からです）。処刑や襲撃の結果は、全員の画面で演出のあとに発表されます。</li><li>勝利条件：市民陣営は人狼の全滅、人狼陣営は人狼の数が人間以上になること。第三陣営は各自の条件を満たした時点で単独勝利し、ゲームが終わります。</li>'+CHATLI+'</ol><div style="font-size:13px"><b>役職一覧</b></div><ol>'+roleLi(Object.keys(RN).filter(k=>k!=='robber'))+'</ol>';
 $('#rl-one').innerHTML='<ol><li>3〜6人で遊べます。カードは「人数＋2枚」で、2枚は誰にも配られない場札です。配役は固定で、3人＝市民1・占い師1・怪盗1・人狼2、4人＝市民2・占い師1・怪盗1・人狼2、5人＝市民3・占い師1・怪盗1・人狼2、6人＝市民4・占い師1・怪盗1・人狼2です。内訳は参加者全員が見られます。</li><li>夜は一度だけです。占い師は1人を占い、怪盗は1人を選んでお互いの役職カードを交換し（交換された人は気づきません）自分の新しい役職を知り、人狼は仲間を確認します。全員が行動またはOKを押すと朝になります。</li><li>昼は議論（チャット）のあと投票します。処刑する人のほかに、「🕊 平和村（人狼はいない）」にも投票できます。2票以上入った人が処刑されますが、平和村が同じ数以上の票を集めたときと、全員が1票以下のときは、誰も処刑されません。</li><li>勝敗は、怪盗の交換を反映した最終的な役職で決まります。人狼を処刑できれば市民陣営の勝ち、逃せば人狼陣営の勝ちです。人狼が全員場札にいる「平和村」では、誰も処刑しなければ市民陣営の勝ち、誰かを処刑すると市民陣営の負けです。</li>'+CHATLI+'</ol><div style="font-size:13px"><b>使える役職</b></div><ol>'+roleLi(ORDER1.concat(['villager']))+'</ol>';
 let chatSubs={},chatData={},myChat=[],lastT={},chMode='all';
 let cview=null,cviewKey='',unread={pub:0,priv:0};
@@ -516,7 +574,7 @@ function resolveOne(s){voteLine(s);const c=tally(s,null),mx=Math.max(0,...Object
 function tryAdvance(s){const al=s.players.filter(p=>p.alive);if(!al.length)return;
  if(s.phase==='night'&&al.every(p=>s.act[p.id])){if(s.mode==='one')toDayOne(s);else resolveNight(s)}
  else if(s.phase==='vote'&&al.every(p=>s.votes[p.id])){if(s.mode==='one')resolveOne(s);else resolveVote(s)}}
-function nact(k,i){act(s=>{if(s.phase!=='night'||s.act[me])return false;if(k==='atk'&&(s.mode==='one'||s.day<2))return false;const m=s.players.find(p=>p.id===me);if(!m||!m.alive)return false;
+function nact(k,i){act(s=>{if(s.phase!=='night'||s.act[me])return false;if((k==='atk'||k==='guard')&&(s.mode==='one'||s.day<2))return false;const m=s.players.find(p=>p.id===me);if(!m||!m.alive)return false;
  const tp=typeof i==='number'?s.players[i]:null;s.act[me]={k,t:tp?tp.id:(i==='none'?'none':'')};
  if(k==='seer'&&tp)ib(s,me,'🔮 '+tp.name+' は「'+(WOLF.includes(tp.role)?'人狼':'人間')+'」です（第'+s.day+'夜）');tryAdvance(s)})}
 function wvote(i){act(s=>{if(s.phase!=='vote')return false;const m=s.players.find(p=>p.id===me);if(!m||!m.alive||s.votes[me])return false;if(i==='peace'){if(s.mode!=='one')return false;s.votes[me]='peace'}else s.votes[me]=s.players[i].id;tryAdvance(s)})}
@@ -552,9 +610,9 @@ function nightPanel(mp){const one=S.mode==='one';
  const btns=(k,l)=>l.map(x=>`<button onclick="nact('${k}',${x.i})">${esc(x.p.name)}</button>`).join('');let t,b;
  if(r==='seer'){t='🔮 占う相手を選んでください';b=btns('seer',al)}
  else if(r==='robber'){t='🕵️ 役職を交換する相手を選んでください（交換された人は気づきません）';b=btns('robber',al)}
- else if(r==='hunter'&&!one){t='🛡 護衛する相手を選んでください';b=btns('guard',al)}
+ else if(r==='hunter'&&!one&&S.day>1){t='🛡 護衛する相手を選んでください';b=btns('guard',al)}
  else if(WOLF.includes(r)&&!one&&S.day>1){t='🐺 襲撃する相手を選んでください（夜のチャットで相談できます）';b=btns('atk',al.filter(x=>!WOLF.includes(x.p.role)))+(r==='able'?'<button onclick="nact(\'atk\',\'none\')">襲撃しない</button>':'')}
- else{t=WOLF.includes(r)?(one?'🐺 仲間を確認したら、夜が明けるのを待ちましょう':'🐺 第1夜は襲撃できません（襲撃は第2夜から）。仲間を確認したら、夜が明けるのを待ちましょう'):'🌙 夜が明けるのを待ちます';b='<button class="p" onclick="nact(\'ok\',\'\')">OK（朝を待つ）</button>'}
+ else{t=WOLF.includes(r)?(one?'🐺 仲間を確認したら、夜が明けるのを待ちましょう':'🐺 第1夜は襲撃できません（襲撃は第2夜から）。仲間を確認したら、夜が明けるのを待ちましょう'):(r==='hunter'&&!one?'🛡 第1夜は襲撃がないため護衛できません（護衛は第2夜から）。夜が明けるのを待ちましょう':'🌙 夜が明けるのを待ちます');b='<button class="p" onclick="nact(\'ok\',\'\')">OK（朝を待つ）</button>'}
  return`<div class="box"><b>${t}</b><div class="row" style="margin-top:8px">${b}</div></div>`}
 function votePanel(){if(S.votes[me])return'<div class="box big">✅ 投票済みです。他の人を待っています…</div>';
  const mp=S.players.find(p=>p.id===me),c=S.cands,l=S.players.map((p,i)=>({p,i})).filter(x=>x.p.alive&&x.p.id!==me&&(!c||c.includes(x.p.id)));
@@ -650,11 +708,11 @@ function dayPanel(host){let x;const used=S.extUsed&&S.extUsed[me];
 
 function showRules(){const g=ref&&S?(S.game==='wolf'?(S.mode==='one'?'one':'wolf'):'liar'):gsel;['liar','wolf','one'].forEach(k=>{$('#rl-'+k).style.display=k===g?'':'none'});$('#rules').style.display='flex'}
 function render(){
- const inRoom=!!(ref&&S);$('#bar').style.display=inRoom?'':'none';$('#tb').style.display=inRoom?'flex':'none';$('#ttl').textContent=inRoom?(S.game==='wolf'?(S.mode==='one'?'🌙 ワンナイト人狼':'🐺 人狼'):'🃏 ライアーズ・デッキ'):'🎲 ゲームルーム';$('#bar').className='box'+(inRoom&&S.game==='wolf'?' wolf':'');if(!(inRoom&&S.game==='wolf'))$('#chsel').style.display='none';$('#lcol').style.display=inRoom?'':'none';$('#rcol').style.display=inRoom?'':'none';$('.wrap').className=inRoom?'wrap':'wrap solo';$('#lvb').textContent=(inRoom&&S.phase!=='lobby')?'🛑 やめる':'🚪 退出';if(lv&&inRoom&&(S.phase!=='lobby')!==(lvMode==='game'))lv=false;
+ const inRoom=!!(ref&&S);document.body.classList.toggle('inroom',inRoom);sdRoom(inRoom);$('#bar').style.display=inRoom?'':'none';$('#tb').style.display=inRoom?'flex':'none';$('#ttl').textContent=inRoom?(S.game==='wolf'?(S.mode==='one'?'🌙 ワンナイト人狼':'🐺 人狼'):'🃏 ライアーズ・デッキ'):'🎲 ゲームルーム';$('#bar').className='box'+(inRoom&&S.game==='wolf'?' wolf':'');if(!(inRoom&&S.game==='wolf'))$('#chsel').style.display='none';$('#lcol').style.display=inRoom?'':'none';$('#rcol').style.display=inRoom?'':'none';$('.wrap').className=inRoom?'wrap':'wrap solo';$('#lvb').textContent=(inRoom&&S.phase!=='lobby')?'🛑 やめる':'🚪 退出';if(lv&&inRoom&&(S.phase!=='lobby')!==(lvMode==='game'))lv=false;
  if(lv&&inRoom){$('#lvt').textContent=lvMode==='game'?'ゲームをやめますか？':'ルームを退出しますか？';$('#lvs').textContent=lvMode==='game'?'「はい」を押すと、全員がロビーに戻ります。':'「はい」を押すと、このルームから退出します。'}
  $('#lvc').style.display=lv&&inRoom?'flex':'none';
  if(!db){app.innerHTML='<div class="box"><b>Supabaseの設定がまだです。</b><div class="sm" style="font-size:14px;margin-top:6px"><code>supabase-config.js</code> の <code>SUPABASE_URL</code> と <code>SUPABASE_ANON_KEY</code> を、自分のSupabaseプロジェクトの値に書き換えてください。手順は README.md にあります。</div></div>';return}
- if(!ref||!S){app.innerHTML=`<div class="box"><b>名前</b><input id="nm" maxlength="10" placeholder="あなたの名前" value="${esc(myName)}" oninput="myName=this.value"><b style="display:block;margin-top:6px">顔画像（任意）</b><div class="row" style="margin:6px 0"><div class="head ${myImg?'im':''}" style="--c:#b8b0a4;flex:none;margin:0;${myImg?'background-image:url('+myImg+')':''}">${myImg?'':'<i></i><i></i><b></b>'}</div><input type="file" id="fi" accept="image/*" onchange="pickImg(this.files[0])" style="flex:1;margin:0;width:auto">${myImg?'<button onclick="myImg=\'\';saveImg();render()">削除</button>':''}</div><div class="sm" style="margin-bottom:8px">画像を選ぶと、その顔がリアクションで動きます。選ばない場合は標準の顔です。</div>
+ if(!ref||!S){app.innerHTML=`<div class="box"><b>名前</b><input id="nm" maxlength="10" placeholder="あなたの名前" value="${esc(myName)}" oninput="myName=this.value"><b style="display:block;margin-top:6px">顔画像（任意）</b><div class="row" style="margin:6px 0;flex-wrap:nowrap;min-width:0"><div class="head ${myImg?'im':''}" style="--c:#b8b0a4;flex:none;margin:0;${myImg?'background-image:url('+myImg+')':''}">${myImg?'':'<i></i><i></i><b></b>'}</div><label class="fbtn">${myImg?'📷 画像を変更':'📷 画像を選ぶ'}<input type="file" id="fi" accept="image/*" onchange="pickImg(this.files[0])" hidden></label>${myImg?'<button style="flex:none" onclick="myImg=\'\';saveImg();render()">削除</button>':''}</div><div class="sm" style="margin-bottom:8px">画像を選ぶと、その顔がリアクションで動きます。選ばない場合は標準の顔です。</div>
   <b style="display:block;margin-top:6px">ゲームの種類</b><select style="width:100%;margin:6px 0 10px" onchange="gsel=this.value;render()"><option value="liar" ${gsel==='liar'?'selected':''}>🃏 ライアーズ・デッキ（2〜4人）</option><option value="wolf" ${gsel==='wolf'?'selected':''}>🐺 人狼（4〜20人）</option><option value="one" ${gsel==='one'?'selected':''}>🌙 ワンナイト人狼（3〜6人）</option></select><button class="p" onclick="enter(rc(),true,gsel)">ルームを作る（ホスト）</button></div>
   <div class="box"><b>ルームコードで入る</b><input id="cd" maxlength="4" placeholder="例：AB3K" style="text-transform:uppercase"><button onclick="enter($('#cd').value.trim().toUpperCase(),false)">入室</button></div>
   <div class="box sm">${gsel==='one'?'3〜6人で遊ぶワンナイト人狼です。配役は固定（市民・占い師・怪盗・人狼2）で、夜は一度だけ。人狼が場札に隠れた「平和村」のこともあります。詳しくは「📖 ルール」を見てください。':gsel==='wolf'?'4〜20人で遊ぶ人狼です。人数ごとに市民陣営・人狼陣営の枚数が決まっていて、ホストは役職市民を外したり、8人以上の偶数なら第三陣営を入れたりできます。詳しくは「📖 ルール」を見てください。':'Q・K・A 各6枚＋ジョーカー2枚。お題の絵柄として伏せて最大3枚出し、嘘だと思ったら次の人が「嘘だ！」。外れた方がロシアンルーレット。最後の1人が勝者です。🃏はお題として何にでも扱えます。'}</div>${msg?`<div class="box" style="color:var(--acc)">${esc(msg)}</div>`:''}`;return}
