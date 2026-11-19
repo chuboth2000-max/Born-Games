@@ -39,6 +39,8 @@ button.p{background:var(--acc);color:#fff;border-color:var(--acc)}button:disable
 .ov .box{max-width:420px;width:100%;text-align:center;margin:0}
 .ch{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid var(--fg);margin:0 2px}.ch.u{background:var(--mut)}.ch.x{background:var(--acc)}
 .emo button{padding:6px 10px}
+#emp{max-height:30vh;overflow:auto}
+#emt.on{background:var(--acc);border-color:var(--acc)}
 
 .bub{top:auto;bottom:100%;margin-bottom:2px;width:max-content;max-width:150px;z-index:5;min-height:0;font-size:26px}
 .bub span{display:inline-block;word-break:break-all}
@@ -179,10 +181,16 @@ textarea{font:inherit;padding:9px 10px;border-radius:8px;border:1px solid var(--
  #sdr.tc #lcol{display:none!important}
  #sdr.tl #rcol{display:none!important}
  #rcol #chsel,#rcol #cin{flex:none}
+ #ct{font-size:16px}
+ #rcol #emp{flex:none}
 }
+
+/* ===== ホストの強制退出ボタン ===== */
+.kb{display:flex;gap:4px;justify-content:center;margin-top:4px}
+.kb button{padding:2px 8px;font-size:11px;border-radius:6px;white-space:nowrap}
+.kb button.dg{background:#b3261e;color:#fff;border-color:#b3261e}
 </style></head><body><main><h1 style="display:flex;align-items:center;gap:10px"><span id="ttl">🎲 ゲームルーム</span> <button onclick="showRules()" style="font-size:13px">📖 ルール</button></h1><div class="wrap"><aside id="lcol" class="box side" style="display:none"><b>📜 ラウンドログ</b><div id="glog" class="slog"></div></aside><div id="center"><div id="app"></div>
-<div id="bar" class="box" style="display:none"><div class="emo row" style="justify-content:center"><button onclick="emote('shake')">🙅 首振り</button><button onclick="emote('nod')">🙆 うなずき</button><span id="emos" class="row"></span></div>
-<div id="chsel" class="row" style="margin-top:8px;display:none"></div><div id="cin" class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="ct" maxlength="40" placeholder="メッセージ（頭の上に吹き出しで表示）" style="flex:1;margin:0;width:auto" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229)sendChat()"><button class="p" onclick="sendChat()">送信</button></div></div></div><aside id="rcol" class="box side" style="display:none"><b>💬 チャット</b><div id="cview" class="row" style="display:none;gap:4px;margin:6px 0 0"></div><div id="clog" class="slog"></div></aside></div></main>
+<div id="bar" class="box" style="display:none"><div id="chsel" class="row" style="margin-top:8px;display:none"></div><div id="emp" class="emo row" style="display:none;margin-top:8px;justify-content:center"><button onclick="emote('shake')">🙅 首振り</button><button onclick="emote('nod')">🙆 うなずき</button><span id="emos" class="row"></span></div><div id="cin" class="row" style="margin-top:8px;flex-wrap:nowrap"><button id="emt" type="button" onclick="empToggle()" aria-label="リアクションを開く" aria-expanded="false" style="flex:none;padding:9px 10px">😀</button><input id="ct" maxlength="40" placeholder="メッセージ（頭の上に吹き出しで表示）" style="flex:1;margin:0;width:auto" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229)sendChat()"><button class="p" onclick="sendChat()">送信</button></div></div></div><aside id="rcol" class="box side" style="display:none"><b>💬 チャット</b><div id="cview" class="row" style="display:none;gap:4px;margin:6px 0 0"></div><div id="clog" class="slog"></div></aside></div></main>
 <button id="sdt" onclick="sdToggle(true)" aria-label="チャットとログを開く"></button>
 <div id="sdr"><div class="sdh"><button id="sdt1" onclick="sdTab('c')"></button><button id="sdt2" onclick="sdTab('l')"></button><button class="x" onclick="sdToggle(false)" aria-label="閉じる">✕</button></div><div id="sdb"></div></div>
 <div id="tb" style="display:none"><button id="memob" onclick="showMemo()">📝 メモ</button><button id="lvb" onclick="askLeave()">🚪 退出</button></div><div id="lvc" class="ov" style="display:none"><div class="box"><p id="lvt" style="font-size:17px;font-weight:700;margin:0 0 6px"></p><div id="lvs" class="sm" style="margin-bottom:12px;font-size:14px"></div><div class="row" style="justify-content:center"><button class="p" onclick="lvYes()">はい</button><button onclick="lv=false;render()">いいえ</button></div></div></div><div id="rcard" class="ov" style="display:none;z-index:45;flex-direction:column"></div><div id="rolelist" class="ov" style="display:none;z-index:45" onclick="if(event.target===this)this.style.display='none'"></div><div id="roledetail" class="ov" style="display:none;z-index:55" onclick="if(event.target===this)this.style.display='none'"></div><div id="memo" class="ov" style="display:none;z-index:60;overscroll-behavior:contain"><div class="box" style="max-width:640px;width:100%;text-align:left;margin:0"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b style="font-size:18px">📝 メモ（自分だけに表示）</b><button class="p" onclick="closeMemo()">閉じる</button></div><textarea id="memot" style="width:100%;height:min(60vh,520px);resize:vertical;margin:8px 0 4px;font-size:16px;line-height:1.5" placeholder="気づいたことを自由に書いてください（文字数の上限はありません）" oninput="saveMemo()"></textarea><div class="sm">このメモはあなたの端末にだけ保存され、他の人には見えません。</div></div></div><div id="toast" style="display:none"></div><div id="ovl"></div><div id="evl" style="display:none"></div>
@@ -220,9 +228,9 @@ async function enter(c,create,game){
  try{const sn=await ref.get();
   if(create){if(sn.exists)return enter(rc(),true,game);if(!(await ref.set((game==='wolf'||game==='one')?newWolf(c,game==='one'?'one':'normal'):{code:c,game:'liar',host:me,phase:'lobby',players:[mk(0)],log:[]},0)))return enter(rc(),true,game)}
   else{if(!sn.exists){msg='ルームが見つかりません';ref=null;return render()}
-   const s=sn.data();if(!s.players.some(p=>p.id===me)){if(s.phase!=='lobby'||s.players.length>=(s.game==='wolf'?(s.mode==='one'?6:20):4)){msg='入室できません（満員、または開始済み）';ref=null;return render()}if(!s.players.length)s.host=me;const q=mk(s.players.length);q.color=[...Array(20).keys()].find(c=>!s.players.some(p=>p.color===c));s.players.push(q);if((await ref.set(s,sn.ver))===false)return enter(c,false,game)}}
+   const s=sn.data();if((s.kicked||[]).includes(me)){msg='このルームには入室できません（ホストにより退出させられました）';ref=null;return render()}{const q0=s.players.find(p=>p.id===me);if(q0&&q0.left){msg='この試合からは脱落・退出済みのため入室できません（次のゲームから参加できます）';ref=null;return render()}}if(!s.players.some(p=>p.id===me)){if(s.phase!=='lobby'||s.players.length>=(s.game==='wolf'?(s.mode==='one'?6:20):4)){msg='入室できません（満員、または開始済み）';ref=null;return render()}if(!s.players.length)s.host=me;const q=mk(s.players.length);q.color=[...Array(20).keys()].find(c=>!s.players.some(p=>p.color===c));s.players.push(q);if((await ref.set(s,sn.ver))===false)return enter(c,false,game)}}
  }catch(e){msg='入室に失敗：'+(e.message||e.code);ref=null;return render()}
- eref=db.doc('emotes/'+c);eunsub=eref.onSnapshot(sn=>{const d=sn.exists?sn.data():null;if(d&&d.id!==me&&Math.abs(Date.now()-d.t)<10000)showEmote(d)},()=>{});
+ hbStart();eref=db.doc('emotes/'+c);eunsub=eref.onSnapshot(sn=>{const d=sn.exists?sn.data():null;if(d&&d.id!==me&&Math.abs(Date.now()-d.t)<10000)showEmote(d)},()=>{});
  unsub=ref.onSnapshot(onState,e=>{msg='同期エラー';render()});
 }
 function showEmote(d){const L=(d.e==='shake'||d.e==='nod'||[...d.e].length<=2)?1900:4500;em[d.id]={e:d.e,t:Date.now()+L};if(d.e!=='shake'&&d.e!=='nod'&&!(S&&S.game==='wolf')){chatLog.push({id:d.id,e:d.e});renderChat()}render();setTimeout(render,L+100)}
@@ -254,11 +262,12 @@ function liar(){act(s=>{const c=s.players[s.turn];if(s.phase!=='play'||c.id!==me
  const l=truth?c:a,r=pullTrigger(s,l);
  s.rev={t:Date.now(),callerId:c.id,caller:c.name,accused:a.name,cards:s.last.cards,truth,loser:l.id,lname:l.name,died:r.died,n:r.n,pulls:l.pulls,nobonus:!!nobonus};s.phase='reveal';endCheck(s)})}
 let lvMode='';
-function askLeave(){if(!S||!ref)return;lvMode=S.phase==='lobby'?'lobby':'game';lv=true;render()}
-function lvYes(){const m=lvMode;lv=false;
+const lvExpect=()=>S.phase==='lobby'?'lobby':(S.host===me?'game':'quit');
+function askLeave(){if(!S||!ref)return;lvMode=lvExpect();lv=true;render()}
+function lvYes(){const m=lvMode;lv=false;if(m==='quit'){leave();return}
  if(m==='game'){if(S&&S.phase!=='lobby')abortGame();else render()}
  else{if(S&&S.phase==='lobby')leave();else render()}}
-function abortGame(){act(s=>{if(s.phase==='lobby')return false;
+function abortGame(){act(s=>{if(s.phase==='lobby'||s.host!==me)return false;
  s.players=s.players.filter(p=>!p.left);
  if(s.game==='wolf'){s.players.forEach(p=>{p.alive=true;p.role='villager';p.fin='villager';p.pair=''});s.phase='lobby';s.act={};s.votes={};s.inbox={};s.log=[];s.winners=[];s.winTxt='';s.ext=null;s.extSec=0;s.extDay=0;s.extUsed={};s.extRes=null;s.center=[];s.cands=null;s.rv=0;s.gid=(s.gid||0)+1}
  else{s.players.forEach(p=>{p.hand=[];p.alive=true;p.pulls=0;p.ch=6});s.phase='lobby';s.rev=null;s.last=null;s.winner=null;s.log=[]}})}
@@ -266,14 +275,30 @@ async function leave(){lv=false;
  await act(s=>{const i=s.players.findIndex(p=>p.id===me);if(i<0)return false;const p=s.players[i];
   if(s.game==='wolf'){wolfLeave(s,i);return}
   if(s.phase==='lobby'){s.players.splice(i,1);if(s.host===me&&s.players.length)s.host=s.players[0].id;return}
-  const wasTurn=s.phase==='play'&&s.turn===i&&p.alive;p.alive=false;p.left=true;p.hand=[];
-  s.log=(s.log||[]).concat(p.name+' が退出した');
-  if(s.host===me){const h=s.players.find(q=>!q.left);if(h)s.host=h.id}
-  const al=s.players.filter(q=>q.alive);
-  if(s.phase!=='over'&&al.length<2){s.phase='over';s.winner=al.length?al[0].name:'（なし）';return}
-  if(wasTurn)s.turn=nextAlive(s,i)});
+  liarLeave(s,i,false)});
+ exitLocal('')}
+function liarLeave(s,i,kick){const p=s.players[i];
+ if(s.phase==='lobby'){s.players.splice(i,1);if(s.host===p.id&&s.players.length)s.host=s.players[0].id;return}
+ const wasTurn=s.phase==='play'&&s.turn===i&&p.alive;p.alive=false;p.left=true;p.hand=[];
+ s.log=(s.log||[]).concat(p.name+(kick==='dc'?' の接続が切れた（脱落）':kick?' が強制退出させられた':' が退出した'));
+ if(s.host===p.id){const h=s.players.find(q=>!q.left);if(h)s.host=h.id}
+ const al=s.players.filter(q=>q.alive);
+ if(s.phase!=='over'&&al.length<2){s.phase='over';s.winner=al.length?al[0].name:'（なし）';return}
+ if(wasTurn)s.turn=nextAlive(s,i)}
+/* ローカルの画面状態を初期化して入室前に戻す（自分で退出／ホストに退出させられた時の共通処理） */
+function exitLocal(m){
+ hbStop();
  if(unsub){unsub();unsub=null}if(eunsub){eunsub();eunsub=null}
- ref=null;eref=null;S=null;code='';sel.clear();msg='';$('#ovl').innerHTML='';ovKey='';lastRevT=0;chatLog=[];wReset();cardOpen='';cardClosed='';lastExtN=-1;evReset();$('#rcard').style.display='none';renderChat();render()}
+ ref=null;eref=null;S=null;code='';sel.clear();msg=m||'';kickAsk='';$('#ovl').innerHTML='';ovKey='';lastRevT=0;chatLog=[];wReset();cardOpen='';cardClosed='';lastExtN=-1;evReset();$('#rcard').style.display='none';renderChat();render()}
+/* ===== ホストによる強制退出 ===== */
+let kickAsk='';
+function kickBtn(p){if(!S||S.host!==me||p.id===me||p.left)return'';
+ if(kickAsk===p.id)return`<div class="kb"><button class="dg" onclick="kickDo('${p.id}')">退出させる</button><button onclick="kickAsk='';render()">やめる</button></div>`;
+ return`<div class="kb"><button onclick="kickAsk='${p.id}';render();setTimeout(()=>{if(kickAsk==='${p.id}'){kickAsk='';render()}},6000)">✕ 退出</button></div>`}
+function kickDo(id){kickAsk='';
+ act(s=>{if(s.host!==me||id===me)return false;const i=s.players.findIndex(q=>q.id===id);if(i<0||s.players[i].left)return false;
+  s.kicked=(s.kicked||[]).concat(id);
+  if(s.game==='wolf')wolfLeave(s,i,true);else liarLeave(s,i,true)});render()}
 try{myImg=localStorage.getItem('ldimg')||''}catch(e){}
 function saveImg(){try{localStorage.setItem('ldimg',myImg)}catch(e){}}
 function pickImg(f){if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=64;c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,64,64);myImg=c.toDataURL('image/jpeg',.6);saveImg();render()};im.src=r.result};r.readAsDataURL(f)}
@@ -281,7 +306,7 @@ const EMO=['😏','😱','😂','🤔','🔫','👍','😭','😎','🥺','🙏'
 $('#emos').innerHTML=EMO.map(e=>`<button onclick="emote('${e}')">${e}</button>`).join('');
 function sendChat(){const i=$('#ct'),t=i.value.trim();if(!t)return;i.value='';emote(t)}
 let ovKey='',lastRevT=0,revWait=0,chatLog=[],deathShown={},shufUntil=0,lastRound=-1,lastPk='',phaseStart=Date.now(),cardOpen='',cardClosed='',extSeenN=0,extSeenT=0,lastExtN=-1;
-function onState(sn){S=sn.exists?sn.data():null;if(S)sel.clear();evCheck();notifyComp();
+function onState(sn){S=sn.exists?sn.data():null;if(S&&Array.isArray(S.kicked)&&S.kicked.includes(me)){exitLocal('ホストにより退出させられました');return}if(S&&hbOn){const mp0=S.players.find(p=>p.id===me);if(!mp0||mp0.left){exitLocal('通信が一定時間途切れたため、ゲームから脱落・退出扱いになりました');return}hbSync()}if(S)sel.clear();evCheck();notifyComp();
  if(S&&S.game==='wolf'){if(lastExtN===-1)lastExtN=S.extRes?S.extRes.n:0;else if(S.extRes&&S.extRes.n!==lastExtN){lastExtN=S.extRes.n;msg=S.extRes.ok?'✅ 議論時間が3分延長されました':'❌ 延長は否決されました（次の議論まで再申請できません）';setTimeout(()=>{msg='';render()},3500)}}
  if(S&&S.game==='wolf'){const pk=S.day+':'+S.phase;if(pk!==lastPk){lastPk=pk;phaseStart=Date.now()}}
  if(S&&S.round!==lastRound){lastRound=S.round;if(S.round>=1&&S.phase==='play'){shufUntil=Date.now()+3500;setTimeout(render,3600)}}
@@ -340,10 +365,10 @@ function evClose(){
 const sdMq=window.matchMedia('(max-width:860px)');
 let sdOpen=false,sdTabK='c',sdU={c:0,l:0},sdLast={c:null,l:null},sdIn=false,sdT0=0;
 function sdLayout(){
- const w=$('.wrap'),l=$('#lcol'),r=$('#rcol'),c=$('#center'),b=$('#bar'),cs=$('#chsel'),ci=$('#cin'),body=$('#sdb');
+ const w=$('.wrap'),l=$('#lcol'),r=$('#rcol'),c=$('#center'),b=$('#bar'),cs=$('#chsel'),ep=$('#emp'),ci=$('#cin'),body=$('#sdb');
  if(!w||!body||!l||!r||!c||!b)return;
- if(sdMq.matches){body.appendChild(l);body.appendChild(r);r.appendChild(cs);r.appendChild(ci)}
- else{w.insertBefore(l,c);w.appendChild(r);b.appendChild(cs);b.appendChild(ci);sdOpen=false}
+ if(sdMq.matches){body.appendChild(l);body.appendChild(r);r.appendChild(cs);r.appendChild(ep);r.appendChild(ci)}
+ else{w.insertBefore(l,c);w.appendChild(r);b.appendChild(cs);b.appendChild(ep);b.appendChild(ci);sdOpen=false}
  sdApply()}
 function sdApply(){
  const d=$('#sdr');if(!d)return;
@@ -391,7 +416,7 @@ function hidDeath(p){return !p.alive&&!p.left&&S.rev&&S.rev.died&&p.id===S.rev.l
 function avatar(p,i){const x=em[p.id]&&em[p.id].t>Date.now()?em[p.id].e:'';const al=p.alive||hidDeath(p);const lob=S.phase==='lobby',dn=!lob&&p.alive&&p.hand.length===0,ord=al?(dn?'✔':S.players.filter(q=>(q.alive||hidDeath(q))&&(lob||q.hand.length>0)).indexOf(p)+1):0;
  const an=x==='shake'?'shake':x==='nod'?'nod':x?'bounce':'';const bub=x==='shake'?'🙅':x==='nod'?'🙆':x;
  const cls=/嘘だ/.test(bub)?'call':[...bub].length>2?'txt':'';
- return`<div class="pl ${S.phase==='play'&&S.turn===i?'turn':''} ${al?'':'dead'}">${ord?'<div class="ord">'+ord+'</div>':''}<div class="bub">${bub?`<span class="${cls}">${esc(bub)}</span>`:''}</div><div class="head ${an} ${p.img?'im':''}" style="--c:${COL[p.color%4]};${p.img?'background-image:url('+p.img+')':''}">${p.img?'':'<i></i><i></i><b></b>'}</div><div class="body" style="--c:${COL[p.color%4]}"></div><div class="nm">${esc(p.name)}${S.host===p.id?'👑':''}${p.id===me?'（あなた）':''}</div><div class="sm">${al?(dn?'🎉 あがり ':'🂠×'+p.hand.length+' ')+'🔫'+(p.ch||6)+'発':(p.left?'🚪 退出':'💀 脱落')}</div></div>`}
+ return`<div class="pl ${S.phase==='play'&&S.turn===i?'turn':''} ${al?'':'dead'}">${ord?'<div class="ord">'+ord+'</div>':''}<div class="bub">${bub?`<span class="${cls}">${esc(bub)}</span>`:''}</div><div class="head ${an} ${p.img?'im':''}" style="--c:${COL[p.color%4]};${p.img?'background-image:url('+p.img+')':''}">${p.img?'':'<i></i><i></i><b></b>'}</div><div class="body" style="--c:${COL[p.color%4]}"></div><div class="nm">${esc(p.name)}${S.host===p.id?'👑':''}${p.id===me?'（あなた）':''}</div><div class="sm">${al?(dn?'🎉 あがり ':'🂠×'+p.hand.length+' ')+'🔫'+(p.ch||6)+'発':(p.left?'🚪 退出':'💀 脱落')}</div>${kickBtn(p)}</div>`}
 function renderChat(){const c=$('#clog');if(!c)return;
  const cvEl=$('#cview');if(cvEl&&!(S&&S.game==='wolf'))cvEl.style.display='none';
  if(S&&S.game==='wolf'){const mp=S.players.find(p=>p.id===me)||{},dead=mp.alive===false,rows=[],vis=visibleChannels(mp);updateCview(mp);for(const id in chatData)(chatData[id]||[]).forEach(m=>{if(m.g!==(S.gid||0))return;if(m.ch==='wolf'&&!(WOLF.includes(mp.role)||S.phase==='end'))return;if(m.ch==='dead'&&!(dead||S.phase==='end'))return;if(vis&&!vis.includes(m.ch))return;rows.push(Object.assign({id},m))});rows.sort((a,b)=>a.t-b.t);c.innerHTML=rows.slice(-100).map(m=>{const p=S.players.find(q=>q.id===m.id);return'<div>'+(m.ch==='wolf'?'🐺':m.ch==='dead'?'💀':'')+'<b>'+esc(p?p.name:'?')+'</b>：'+esc(m.e)+'</div>'}).join('');c.scrollTop=c.scrollHeight;return}
@@ -582,12 +607,12 @@ function wforce(){act(s=>{if(s.host!==me)return false;
  if(s.phase==='night'){s.players.filter(p=>p.alive&&!s.act[p.id]).forEach(p=>s.act[p.id]={k:'ok',t:''});tryAdvance(s)}
  else if(s.phase==='vote'){s.players.filter(p=>p.alive&&!s.votes[p.id]).forEach(p=>s.votes[p.id]='abstain');tryAdvance(s)}
  else if(s.phase==='day')toVote(s);else return false})}
-function wolfLeave(s,i){const p=s.players[i];
- if(s.phase==='lobby'){s.players.splice(i,1);if(s.host===me&&s.players.length)s.host=s.players[0].id;return}
+function wolfLeave(s,i,kick){const p=s.players[i];
+ if(s.phase==='lobby'){s.players.splice(i,1);if(s.host===p.id&&s.players.length)s.host=s.players[0].id;return}
  const was=p.alive;p.left=true;p.alive=false;
- if(s.host===me){const h=s.players.find(q=>!q.left);if(h)s.host=h.id}
+ if(s.host===p.id){const h=s.players.find(q=>!q.left);if(h)s.host=h.id}
  if(s.phase==='end')return;
- if(was)rl(s,p.name+' が退出しました（死亡扱い）');
+ if(was)rl(s,p.name+(kick==='dc'?' の接続が切れました（脱落・死亡扱い）':kick?' が強制退出させられました（死亡扱い）':' が退出しました（死亡扱い）'));
  delete s.act[p.id];delete s.votes[p.id];if(s.ext)extCheck(s);
  const w=s.mode==='one'?null:checkWin(s);if(w)return endGame(s,w);tryAdvance(s)}
 function wRemain(){return Math.max(0,Math.ceil(S.cfg.dayMin*60+(S.extSec||0)-(Date.now()-phaseStart)/1000))}
@@ -603,7 +628,7 @@ function wav(p){const mp=S.players.find(q=>q.id===me)||{},tags=[];
  const st=p.left?'🚪 退出':!p.alive&&S.phase!=='lobby'?'💀 死亡':'';
  const rv=S.phase==='end'&&p.role?'<div class="sm" style="color:var(--acc)">'+(S.winners.includes(p.id)?'🏆':'')+RN[p.role]+(p.fin&&p.fin!==p.role?'→'+RN[p.fin]:'')+'</div>':'';
  const x=em[p.id]&&em[p.id].t>Date.now()?em[p.id].e:'',an=x==='shake'?'shake':x==='nod'?'nod':x?'bounce':'',bub=x==='shake'?'🙅':x==='nod'?'🙆':x;
- return`<div class="pl ${p.alive||S.phase==='lobby'?'':'dead'}"><div class="bub">${bub?`<span class="${[...bub].length>2?'txt':''}">${esc(bub)}</span>`:''}</div><div class="head ${an} ${p.img?'im':''}" style="--c:${wcol(p.color)};${p.img?'background-image:url('+p.img+')':''}">${p.img?'':'<i></i><i></i><b></b>'}</div><div class="nm">${esc(p.name)}</div><div class="sm">${tags.join(' ')}</div><div class="sm">${st}</div>${rv}</div>`}
+ return`<div class="pl ${p.alive||S.phase==='lobby'?'':'dead'}"><div class="bub">${bub?`<span class="${[...bub].length>2?'txt':''}">${esc(bub)}</span>`:''}</div><div class="head ${an} ${p.img?'im':''}" style="--c:${wcol(p.color)};${p.img?'background-image:url('+p.img+')':''}">${p.img?'':'<i></i><i></i><b></b>'}</div><div class="nm">${esc(p.name)}</div><div class="sm">${tags.join(' ')}</div><div class="sm">${st}</div>${rv}${kickBtn(p)}</div>`}
 function nightPanel(mp){const one=S.mode==='one';
  if(S.act[me])return'<div class="box big">✅ 行動を送信しました。他の人を待っています…</div>';
  const al=S.players.map((p,i)=>({p,i})).filter(x=>x.p.alive&&x.p.id!==me),r=mp.role;
@@ -711,8 +736,8 @@ function dayPanel(host){let x;const used=S.extUsed&&S.extUsed[me];
 
 function showRules(){const g=ref&&S?(S.game==='wolf'?(S.mode==='one'?'one':'wolf'):'liar'):gsel;['liar','wolf','one'].forEach(k=>{$('#rl-'+k).style.display=k===g?'':'none'});$('#rules').style.display='flex'}
 function render(){
- const inRoom=!!(ref&&S);document.body.classList.toggle('inroom',inRoom);sdRoom(inRoom);$('#bar').style.display=inRoom?'':'none';$('#tb').style.display=inRoom?'flex':'none';$('#ttl').textContent=inRoom?(S.game==='wolf'?(S.mode==='one'?'🌙 ワンナイト人狼':'🐺 人狼'):'🃏 ライアーズ・デッキ'):'🎲 ゲームルーム';$('#bar').className='box'+(inRoom&&S.game==='wolf'?' wolf':'');if(!(inRoom&&S.game==='wolf'))$('#chsel').style.display='none';$('#lcol').style.display=inRoom?'':'none';$('#rcol').style.display=inRoom?'':'none';$('.wrap').className=inRoom?'wrap':'wrap solo';$('#lvb').textContent=(inRoom&&S.phase!=='lobby')?'🛑 やめる':'🚪 退出';if(lv&&inRoom&&(S.phase!=='lobby')!==(lvMode==='game'))lv=false;
- if(lv&&inRoom){$('#lvt').textContent=lvMode==='game'?'ゲームをやめますか？':'ルームを退出しますか？';$('#lvs').textContent=lvMode==='game'?'「はい」を押すと、全員がロビーに戻ります。':'「はい」を押すと、このルームから退出します。'}
+ const inRoom=!!(ref&&S);document.body.classList.toggle('inroom',inRoom);sdRoom(inRoom);$('#bar').style.display=inRoom?'':'none';$('#tb').style.display=inRoom?'flex':'none';$('#ttl').textContent=inRoom?(S.game==='wolf'?(S.mode==='one'?'🌙 ワンナイト人狼':'🐺 人狼'):'🃏 ライアーズ・デッキ'):'🎲 ゲームルーム';$('#bar').className='box'+(inRoom&&S.game==='wolf'?' wolf':'');if(!(inRoom&&S.game==='wolf'))$('#chsel').style.display='none';$('#lcol').style.display=inRoom?'':'none';$('#rcol').style.display=inRoom?'':'none';$('.wrap').className=inRoom?'wrap':'wrap solo';$('#lvb').textContent=(inRoom&&S.phase!=='lobby')?(S.host===me?'🛑 やめる':'🚪 抜ける'):'🚪 退出';if(lv&&inRoom&&lvMode!==lvExpect())lv=false;
+  if(lv&&inRoom){const T={game:['ゲームをやめますか？','「はい」を押すと、全員がロビーに戻ります。'],quit:['ゲームから抜けますか？','「はい」を押すと、あなただけがこのルームから退出します（ゲーム中の場合は死亡扱いになります）。他の人はそのまま続けられます。'],lobby:['ルームを退出しますか？','「はい」を押すと、このルームから退出します。']}[lvMode]||['',''];$('#lvt').textContent=T[0];$('#lvs').textContent=T[1]}
  $('#lvc').style.display=lv&&inRoom?'flex':'none';
  if(!db){app.innerHTML='<div class="box"><b>Supabaseの設定がまだです。</b><div class="sm" style="font-size:14px;margin-top:6px"><code>supabase-config.js</code> の <code>SUPABASE_URL</code> と <code>SUPABASE_ANON_KEY</code> を、自分のSupabaseプロジェクトの値に書き換えてください。手順は README.md にあります。</div></div>';return}
  if(!ref||!S){app.innerHTML=`<div class="box"><b>名前</b><input id="nm" maxlength="10" placeholder="あなたの名前" value="${esc(myName)}" oninput="myName=this.value"><b style="display:block;margin-top:6px">顔画像（任意）</b><div class="row" style="margin:6px 0;flex-wrap:nowrap;min-width:0"><div class="head ${myImg?'im':''}" style="--c:#b8b0a4;flex:none;margin:0;${myImg?'background-image:url('+myImg+')':''}">${myImg?'':'<i></i><i></i><b></b>'}</div><label class="fbtn">${myImg?'📷 画像を変更':'📷 画像を選ぶ'}<input type="file" id="fi" accept="image/*" onchange="pickImg(this.files[0])" hidden></label>${myImg?'<button style="flex:none" onclick="myImg=\'\';saveImg();render()">削除</button>':''}</div><div class="sm" style="margin-bottom:8px">画像を選ぶと、その顔がリアクションで動きます。選ばない場合は標準の顔です。</div>
@@ -777,4 +802,85 @@ try{const bc=new BroadcastChannel('ld-id');
  bc.postMessage({k:'ask',id:me,tab:TAB})}catch(e){}
 window.addEventListener('pagehide',()=>{try{localStorage.setItem('ldname',myName)}catch(e){}});
 render();
+
+/* ===== 接続監視：サイトを閉じた／通信が途切れた人を自動で脱落・退室扱いにする =====
+   各端末が hb/ルーム_自分のID に数秒おきに「生存信号」を書き込みます。
+   信号が一定時間（HB_TIMEOUT）変化しない人は、判定役（ホスト。ホストも不在なら先頭の生存者）が脱落・退室にします。
+   タブを閉じた場合は pagehide で「さようなら」信号を送り、HB_BYE 後に脱落・退室にします。 */
+const HB_TICK=2000,HB_TIMEOUT=60000,HB_BYE=3000;
+let hbOn=false,hbN=0,hbK=0,hbLast=0,hbTimer=null,hbWorker=null,hbSubs={},hbSeen={},hbJudging=false;
+const hbPath=id=>'hb/'+code+'_'+String(id).replace(/[^\w-]/g,'_');
+function hbBeat(){if(!hbOn||!db||!code)return;hbN++;db.doc(hbPath(me)).set({n:hbN,t:Date.now()}).catch(()=>{})}
+function hbGrace(){const t=Date.now();Object.keys(hbSeen).forEach(k=>{hbSeen[k].at=t})}
+function hbStart(){
+ if(hbOn||!db)return;hbOn=true;hbN=0;hbK=0;hbSeen={};hbLast=Date.now();hbBeat();
+ try{const u=URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},'+HB_TICK+')'],{type:'text/javascript'}));hbWorker=new Worker(u);hbWorker.onmessage=hbPulse;setTimeout(()=>URL.revokeObjectURL(u),3000)}
+ catch(e){hbWorker=null;hbTimer=setInterval(hbPulse,HB_TICK)}}
+function hbStop(){
+ hbOn=false;if(hbWorker){try{hbWorker.terminate()}catch(e){}hbWorker=null}if(hbTimer){clearInterval(hbTimer);hbTimer=null}
+ Object.values(hbSubs).forEach(u=>{try{u&&u()}catch(e){}});hbSubs={};hbSeen={};hbJudging=false}
+function hbPulse(){
+ if(!hbOn)return;const now=Date.now();
+ if(now-hbLast>HB_TICK*6)hbGrace();/* 自分の端末が止まっていた間は、他の人を疑わない */
+ hbLast=now;if(++hbK%4===0)hbBeat();hbCheck()}
+function hbSync(){
+ S.players.forEach(p=>{if(p.id===me||hbSubs[p.id])return;
+  hbSeen[p.id]={k:'',bye:false,at:Date.now()};
+  hbSubs[p.id]=db.doc(hbPath(p.id)).onSnapshot(sn=>{const d=sn.exists?sn.data():null;if(!d)return;
+   const k=d.t+':'+d.n+':'+(d.bye?1:0),o=hbSeen[p.id];if(!o||o.k!==k)hbSeen[p.id]={k,bye:!!d.bye,at:Date.now()}},()=>{})})}
+function hbCheck(){
+ if(!S||!ref||!hbOn||hbJudging)return;
+ const now=Date.now(),live=S.players.filter(p=>!p.left);
+ const stale=p=>{if(p.id===me)return false;const o=hbSeen[p.id];return !!o&&now-o.at>(o.bye?HB_BYE:HB_TIMEOUT)};
+ const dead=live.filter(stale);if(!dead.length)return;
+ const ok=live.filter(p=>!stale(p)),judge=ok.find(p=>p.id===S.host)||ok[0];
+ if(!judge||judge.id!==me)return;
+ hbJudging=true;
+ act(s=>{let ch=false;
+  for(const d of dead){const i=s.players.findIndex(q=>q.id===d.id);if(i<0||s.players[i].left)continue;
+   if(s.game==='wolf')wolfLeave(s,i,'dc');else liarLeave(s,i,'dc');ch=true}
+  if(!ch)return false}).finally(()=>{hbJudging=false})}
+/* タブを閉じる／再読み込みのときは keepalive 付きで「さようなら」を送る（アプリ切替などで一時的に隠れただけの場合は送らない） */
+function hbBye(){
+ try{if(!hbOn||!code||typeof SB_READY==='undefined'||!SB_READY)return;
+  fetch(SUPABASE_URL+'/rest/v1/docs',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json',apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({path:hbPath(me),room:code,data:{n:hbN+1,t:Date.now(),bye:true}})}).catch(()=>{})}catch(e){}}
+window.addEventListener('pagehide',e=>{if(!e.persisted)hbBye()});
+window.addEventListener('pageshow',e=>{if(e.persisted&&hbOn){hbGrace();hbBeat()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&hbOn){hbGrace();hbBeat()}});
+/* ===== リアクションの開閉 ===== */
+function empSet(f){const p=document.getElementById('emp'),t=document.getElementById('emt');if(!p||!t)return;p.style.display=f?'flex':'none';t.classList.toggle('on',f);t.setAttribute('aria-expanded',f?'true':'false');t.setAttribute('aria-label',f?'リアクションを閉じる':'リアクションを開く');if(f){const l=document.getElementById('clog');if(l)l.scrollTop=l.scrollHeight}}
+function empToggle(){const p=document.getElementById('emp');empSet(!p||p.style.display==='none')}
+document.getElementById('emp').addEventListener('click',e=>{if(e.target.closest('button'))empSet(false)});
+
+/* ===== スマホ：チャット入力中にページ位置を維持する ===== */
+(function(){
+ const vv=window.visualViewport,mq=window.matchMedia('(max-width:860px)');
+ let on=false,y0=0,own=false;
+ const drawer=()=>document.getElementById('sdr');
+ function fit(){
+  const d=drawer();if(!d||!on)return;
+  const kb=vv?Math.max(0,window.innerHeight-vv.offsetTop-vv.height):0;
+  d.style.bottom=kb+'px';
+  d.style.paddingBottom=kb>0?'0px':'';
+  if(vv&&vv.offsetTop>0)window.scrollTo(0,0);
+ }
+ function lock(){
+  if(on||!mq.matches)return;
+  const b=document.body;
+  if(b.style.position==='fixed')return;
+  on=true;own=true;y0=window.scrollY||0;
+  b.style.position='fixed';b.style.top=-y0+'px';b.style.width='100%';
+  fit();
+ }
+ function unlock(){
+  if(!on)return;on=false;
+  const b=document.body,d=drawer();
+  if(own){b.style.position='';b.style.top='';b.style.width='';window.scrollTo(0,y0);own=false}
+  if(d){d.style.bottom='';d.style.paddingBottom=''}
+ }
+ document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='ct')lock()});
+ document.addEventListener('focusout',e=>{if(e.target&&e.target.id==='ct')setTimeout(()=>{if(!document.activeElement||document.activeElement.id!=='ct')unlock()},150)});
+ if(vv){vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit)}
+ window.addEventListener('scroll',()=>{if(on&&vv&&vv.offsetTop>0)fit()},{passive:true});
+})();
 </script></body></html>
