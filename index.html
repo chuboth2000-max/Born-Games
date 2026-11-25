@@ -189,6 +189,8 @@ textarea{font:inherit;padding:9px 10px;border-radius:8px;border:1px solid var(--
 .kb{display:flex;gap:4px;justify-content:center;margin-top:4px}
 .kb button{padding:2px 8px;font-size:11px;border-radius:6px;white-space:nowrap}
 .kb button.dg{background:#b3261e;color:#fff;border-color:#b3261e}
+.bnr{display:inline-flex;align-items:center;gap:6px;padding:3px 4px 3px 10px;border:1px solid var(--fg);border-radius:999px;font-size:13px}
+.bnr button{padding:2px 8px;font-size:11px;border-radius:999px}
 </style></head><body><main><h1 style="display:flex;align-items:center;gap:10px"><span id="ttl">🎲 ゲームルーム</span> <button onclick="showRules()" style="font-size:13px">📖 ルール</button></h1><div class="wrap"><aside id="lcol" class="box side" style="display:none"><b>📜 ラウンドログ</b><div id="glog" class="slog"></div></aside><div id="center"><div id="app"></div>
 <div id="bar" class="box" style="display:none"><div id="chsel" class="row" style="margin-top:8px;display:none"></div><div id="emp" class="emo row" style="display:none;margin-top:8px;justify-content:center"><button onclick="emote('shake')">🙅 首振り</button><button onclick="emote('nod')">🙆 うなずき</button><span id="emos" class="row"></span></div><div id="cin" class="row" style="margin-top:8px;flex-wrap:nowrap"><button id="emt" type="button" onclick="empToggle()" aria-label="リアクションを開く" aria-expanded="false" style="flex:none;padding:9px 10px">😀</button><input id="ct" maxlength="40" placeholder="メッセージ（頭の上に吹き出しで表示）" style="flex:1;margin:0;width:auto" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229)sendChat()"><button class="p" onclick="sendChat()">送信</button></div></div></div><aside id="rcol" class="box side" style="display:none"><b>💬 チャット</b><div id="cview" class="row" style="display:none;gap:4px;margin:6px 0 0"></div><div id="clog" class="slog"></div></aside></div></main>
 <button id="sdt" onclick="sdToggle(true)" aria-label="チャットとログを開く"></button>
@@ -228,7 +230,7 @@ async function enter(c,create,game){
  try{const sn=await ref.get();
   if(create){if(sn.exists)return enter(rc(),true,game);if(!(await ref.set((game==='wolf'||game==='one')?newWolf(c,game==='one'?'one':'normal'):{code:c,game:'liar',host:me,phase:'lobby',players:[mk(0)],log:[]},0)))return enter(rc(),true,game)}
   else{if(!sn.exists){msg='ルームが見つかりません';ref=null;return render()}
-   const s=sn.data();if((s.kicked||[]).includes(me)){msg='このルームには入室できません（ホストにより退出させられました）';ref=null;return render()}{const q0=s.players.find(p=>p.id===me);if(q0&&q0.left){msg='この試合からは脱落・退出済みのため入室できません（次のゲームから参加できます）';ref=null;return render()}}if(!s.players.some(p=>p.id===me)){if(s.phase!=='lobby'||s.players.length>=(s.game==='wolf'?(s.mode==='one'?6:20):4)){msg='入室できません（満員、または開始済み）';ref=null;return render()}if(!s.players.length)s.host=me;const q=mk(s.players.length);q.color=[...Array(20).keys()].find(c=>!s.players.some(p=>p.color===c));s.players.push(q);if((await ref.set(s,sn.ver))===false)return enter(c,false,game)}}
+   const s=sn.data();if((s.kicked||[]).includes(me)){msg='このルームには入室できません（ホストによりBANされています）';ref=null;return render()}{const q0=s.players.find(p=>p.id===me);if(q0&&q0.left){msg='この試合からは脱落・退出済みのため入室できません（次のゲームから参加できます）';ref=null;return render()}}if(!s.players.some(p=>p.id===me)){if(s.phase!=='lobby'||s.players.length>=(s.game==='wolf'?(s.mode==='one'?6:20):4)){msg='入室できません（満員、または開始済み）';ref=null;return render()}if(!s.players.length)s.host=me;const q=mk(s.players.length);q.color=[...Array(20).keys()].find(c=>!s.players.some(p=>p.color===c));s.players.push(q);if((await ref.set(s,sn.ver))===false)return enter(c,false,game)}}
  }catch(e){msg='入室に失敗：'+(e.message||e.code);ref=null;return render()}
  hbStart();eref=db.doc('emotes/'+c);eunsub=eref.onSnapshot(sn=>{const d=sn.exists?sn.data():null;if(d&&d.id!==me&&Math.abs(Date.now()-d.t)<10000)showEmote(d)},()=>{});
  unsub=ref.onSnapshot(onState,e=>{msg='同期エラー';render()});
@@ -292,13 +294,19 @@ function exitLocal(m){
  ref=null;eref=null;S=null;code='';sel.clear();msg=m||'';kickAsk='';$('#ovl').innerHTML='';ovKey='';lastRevT=0;chatLog=[];wReset();cardOpen='';cardClosed='';lastExtN=-1;evReset();$('#rcard').style.display='none';renderChat();render()}
 /* ===== ホストによる強制退出 ===== */
 let kickAsk='';
-function kickBtn(p){if(!S||S.host!==me||p.id===me||p.left)return'';
- if(kickAsk===p.id)return`<div class="kb"><button class="dg" onclick="kickDo('${p.id}')">退出させる</button><button onclick="kickAsk='';render()">やめる</button></div>`;
- return`<div class="kb"><button onclick="kickAsk='${p.id}';render();setTimeout(()=>{if(kickAsk==='${p.id}'){kickAsk='';render()}},6000)">✕ 退出</button></div>`}
+function kickBtn(p){if(!S||S.host!==me||p.id===me||p.left)return'';const lob=S.phase==='lobby';
+ if(kickAsk===p.id)return`<div class="kb"><button class="dg" onclick="kickDo('${p.id}')">${lob?'BANする':'退出させる'}</button><button onclick="kickAsk='';render()">やめる</button></div>`;
+ return`<div class="kb"><button onclick="kickAsk='${p.id}';render();setTimeout(()=>{if(kickAsk==='${p.id}'){kickAsk='';render()}},6000)">${lob?'🚫 BAN':'✕ 退出'}</button></div>`}
 function kickDo(id){kickAsk='';
  act(s=>{if(s.host!==me||id===me)return false;const i=s.players.findIndex(q=>q.id===id);if(i<0||s.players[i].left)return false;
-  s.kicked=(s.kicked||[]).concat(id);
+  s.kicked=(s.kicked||[]).concat(id);s.kickedNames=Object.assign({},s.kickedNames||{},{[id]:s.players[i].name});
   if(s.game==='wolf')wolfLeave(s,i,true);else liarLeave(s,i,true)});render()}
+/* ロビーで、ホストにだけ「BANした人」の一覧と解除ボタンを表示 */
+function banBox(){if(!S||S.host!==me||S.phase!=='lobby')return'';
+ const k=(S.kicked||[]).filter(id=>/^[\w-]+$/.test(id));if(!k.length)return'';const nm=S.kickedNames||{};
+ return`<div class="box"><div class="sm" style="text-align:center;margin-bottom:6px">🚫 BANした人（解除すると、また入室できます）</div><div class="row" style="justify-content:center">${k.map(id=>`<span class="bnr">${esc(nm[id]||'（名前不明）')}<button onclick="unbanDo('${id}')">解除</button></span>`).join('')}</div></div>`}
+function unbanDo(id){act(s=>{if(s.host!==me||s.phase!=='lobby'||!(s.kicked||[]).includes(id))return false;
+ s.kicked=s.kicked.filter(x=>x!==id);if(s.kickedNames)delete s.kickedNames[id]});render()}
 try{myImg=localStorage.getItem('ldimg')||''}catch(e){}
 function saveImg(){try{localStorage.setItem('ldimg',myImg)}catch(e){}}
 function pickImg(f){if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=64;c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,64,64);myImg=c.toDataURL('image/jpeg',.6);saveImg();render()};im.src=r.result};r.readAsDataURL(f)}
@@ -306,7 +314,7 @@ const EMO=['😏','😱','😂','🤔','🔫','👍','😭','😎','🥺','🙏'
 $('#emos').innerHTML=EMO.map(e=>`<button onclick="emote('${e}')">${e}</button>`).join('');
 function sendChat(){const i=$('#ct'),t=i.value.trim();if(!t)return;i.value='';emote(t)}
 let ovKey='',lastRevT=0,revWait=0,chatLog=[],deathShown={},shufUntil=0,lastRound=-1,lastPk='',phaseStart=Date.now(),cardOpen='',cardClosed='',extSeenN=0,extSeenT=0,lastExtN=-1;
-function onState(sn){S=sn.exists?sn.data():null;if(S&&Array.isArray(S.kicked)&&S.kicked.includes(me)){exitLocal('ホストにより退出させられました');return}if(S&&hbOn){const mp0=S.players.find(p=>p.id===me);if(!mp0||mp0.left){exitLocal('通信が一定時間途切れたため、ゲームから脱落・退出扱いになりました');return}hbSync()}if(S)sel.clear();evCheck();notifyComp();
+function onState(sn){S=sn.exists?sn.data():null;if(S&&Array.isArray(S.kicked)&&S.kicked.includes(me)){exitLocal(S.phase==='lobby'?'ホストによりBANされました':'ホストにより退出させられました');return}if(S&&hbOn){const mp0=S.players.find(p=>p.id===me);if(!mp0||mp0.left){exitLocal('通信が一定時間途切れたため、ゲームから脱落・退出扱いになりました');return}hbSync()}if(S)sel.clear();evCheck();notifyComp();
  if(S&&S.game==='wolf'){if(lastExtN===-1)lastExtN=S.extRes?S.extRes.n:0;else if(S.extRes&&S.extRes.n!==lastExtN){lastExtN=S.extRes.n;msg=S.extRes.ok?'✅ 議論時間が3分延長されました':'❌ 延長は否決されました（次の議論まで再申請できません）';setTimeout(()=>{msg='';render()},3500)}}
  if(S&&S.game==='wolf'){const pk=S.day+':'+S.phase;if(pk!==lastPk){lastPk=pk;phaseStart=Date.now()}}
  if(S&&S.round!==lastRound){lastRound=S.round;if(S.round>=1&&S.phase==='play'){shufUntil=Date.now()+3500;setTimeout(render,3600)}}
@@ -648,7 +656,7 @@ function renderWolf(){syncChat();
  if(ph==='day'&&S.ext)h+=extBanner(mp);
  if(ph==='lobby'){chMode='all';const one=S.mode==='one',cfg=S.cfg,err=wCheck(S),mn=one?3:4,mx=one?6:20,how=cfg.how||'rec';
   h+=`<div class="box"><div class="sm" style="text-align:center">ルームコード（友だちに伝えてください）</div><div class="code">${esc(S.code)}</div></div>
-  <div class="box"><div class="wg">${live.map(wav).join('')}</div><div class="sm" style="text-align:center;margin-top:8px;font-size:14px">参加 ${N}/${mx}人（${mn}人以上で開始できます）</div></div>`;
+  <div class="box"><div class="wg">${live.map(wav).join('')}</div><div class="sm" style="text-align:center;margin-top:8px;font-size:14px">参加 ${N}/${mx}人（${mn}人以上で開始できます）</div></div>${banBox()}`;
   const day=host?`議論時間 <select onchange="wcfg('dayMin',+this.value)">${[1,2,3,5,7,10].map(m=>`<option value="${m}" ${cfg.dayMin===m?'selected':''}>${m}分</option>`).join('')}</select>`:`議論時間：${cfg.dayMin}分`;
   h+=compBox(N,one,host,day);
   h+=`<div class="box row" style="justify-content:center"><button onclick="showRoles()">📋 役職一覧</button>${maniSw()}${voteSw()}${host?`<button class="p" ${err?'disabled':''} onclick="wstart()">ゲーム開始</button>${err?'<span class="sm">'+err+'</span>':''}`:'<span class="sm">ホストの開始を待っています…</span>'}</div>`;
@@ -748,7 +756,7 @@ function render(){
  const me_i=S.players.findIndex(p=>p.id===me),mp=S.players[me_i];
  let h=msg?`<div class="box" style="color:var(--acc)">${esc(msg)}</div>`:'';
  if(S.phase==='lobby'){
-  h+=`<div class="box"><div class="sm" style="text-align:center">ルームコード（友だちに伝えてください）</div><div class="code">${esc(S.code)}</div></div><div class="box"><div class="tbl">${S.players.map(avatar).join('')}</div></div>
+  h+=`<div class="box"><div class="sm" style="text-align:center">ルームコード（友だちに伝えてください）</div><div class="code">${esc(S.code)}</div></div><div class="box"><div class="tbl">${S.players.map(avatar).join('')}</div></div>${banBox()}
   <div class="box row">${S.host===me?`<button class="p" ${S.players.length<2?'disabled':''} onclick="start()">ゲーム開始（${S.players.length}/4人）</button>`:'<span class="sm">ホストの開始を待っています…（'+S.players.length+'/4人）</span>'}</div>`;
  }else{
   const myTurn=S.phase==='play'&&mp&&S.players[S.turn].id===me&&mp.alive,hl=mp?mp.hand.length:0,cur=S.players[S.turn];
