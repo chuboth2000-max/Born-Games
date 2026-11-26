@@ -191,6 +191,36 @@ textarea{font:inherit;padding:9px 10px;border-radius:8px;border:1px solid var(--
 .kb button.dg{background:#b3261e;color:#fff;border-color:#b3261e}
 .bnr{display:inline-flex;align-items:center;gap:6px;padding:3px 4px 3px 10px;border:1px solid var(--fg);border-radius:999px;font-size:13px}
 .bnr button{padding:2px 8px;font-size:11px;border-radius:999px}
+
+/* ===== 人狼：参加者を横一列に並べ、増えたら横スクロール ===== */
+.wg{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;gap:10px;padding:2px 34px 10px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:thin}
+.wg .pl{flex:none;margin-top:54px}
+.wg>.pl:first-child{margin-left:auto}.wg>.pl:last-child{margin-right:auto}
+
+/* ===== 勝利演出 ===== */
+.cfw{position:fixed;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;z-index:3}
+.cfw i{position:absolute;top:-30px;border-radius:2px;animation-name:cfall;animation-timing-function:linear;animation-iteration-count:2;animation-fill-mode:both}
+@keyframes cfall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(112vh) rotate(720deg)}}
+@keyframes wtro{0%{opacity:0;transform:translateY(-90px) scale(.4)}60%{opacity:1;transform:translateY(8px) scale(1.15)}100%{opacity:1;transform:none}}
+@keyframes wpop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:none}}
+@keyframes wglow{0%,100%{opacity:.25;transform:scale(.9)}50%{opacity:.5;transform:scale(1.08)}}
+#evl .evw.win{gap:14px;z-index:2}
+#evl .wglow{position:absolute;left:50%;top:-40px;width:420px;height:420px;margin-left:-210px;border-radius:50%;background:radial-gradient(circle,var(--ac) 0%,transparent 66%);animation:wglow 2.4s infinite;pointer-events:none;z-index:-1}
+#evl .wk{font-size:14px;letter-spacing:.45em;color:#b9aea0;animation:evf .6s .1s both}
+#evl .wtro{font-size:88px;line-height:1;animation:wtro .9s .2s both;filter:drop-shadow(0 0 22px var(--ac))}
+#evl .wt{font-size:36px;font-weight:900;color:var(--ac);text-shadow:0 0 18px var(--ac);animation:wpop .7s .9s both}
+#evl .wlist{display:flex;flex-direction:column;gap:10px;align-items:center}
+#evl .wrow{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800;padding:6px 18px 6px 10px;border:2px solid var(--ac);border-radius:14px;background:rgba(255,255,255,.07);animation:evf .6s 1.5s both}
+#evl .wrow .rl{font-size:14px;color:var(--ac);font-weight:700}
+#evl .wrow .head{flex:none;width:42px;height:42px}
+#evl .wrow .head i{top:15px;width:5px;height:5px}#evl .wrow .head i:nth-child(1){left:10px}#evl .wrow .head i:nth-child(2){right:10px}
+#evl .wrow .head b{left:14px;top:27px;width:12px;height:5px}
+#evl .wsub{font-size:16px;color:#ddd3c6;animation:evf .7s 2s both}
+.wfx{position:relative;text-align:center}
+.wfx .wtro2{font-size:64px;line-height:1.1;opacity:0;animation:wtro .9s var(--d) both;filter:drop-shadow(0 0 14px var(--acc))}
+.wfx .wnm{font-size:34px;font-weight:900;color:var(--acc);word-break:break-all;opacity:0;animation:wpop .7s calc(var(--d) + .5s) both}
+.wfx .wsub2{font-size:20px;font-weight:700;opacity:0;animation:evf .6s calc(var(--d) + .9s) both}
+@media(prefers-reduced-motion:reduce){.cfw{display:none}}
 </style></head><body><main><h1 style="display:flex;align-items:center;gap:10px"><span id="ttl">🎲 ゲームルーム</span> <button onclick="showRules()" style="font-size:13px">📖 ルール</button></h1><div class="wrap"><aside id="lcol" class="box side" style="display:none"><b>📜 ラウンドログ</b><div id="glog" class="slog"></div></aside><div id="center"><div id="app"></div>
 <div id="bar" class="box" style="display:none"><div id="chsel" class="row" style="margin-top:8px;display:none"></div><div id="emp" class="emo row" style="display:none;margin-top:8px;justify-content:center"><button onclick="emote('shake')">🙅 首振り</button><button onclick="emote('nod')">🙆 うなずき</button><span id="emos" class="row"></span></div><div id="cin" class="row" style="margin-top:8px;flex-wrap:nowrap"><button id="emt" type="button" onclick="empToggle()" aria-label="リアクションを開く" aria-expanded="false" style="flex:none;padding:9px 10px">😀</button><input id="ct" maxlength="40" placeholder="メッセージ（頭の上に吹き出しで表示）" style="flex:1;margin:0;width:auto" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229)sendChat()"><button class="p" onclick="sendChat()">送信</button></div></div></div><aside id="rcol" class="box side" style="display:none"><b>💬 チャット</b><div id="cview" class="row" style="display:none;gap:4px;margin:6px 0 0"></div><div id="clog" class="slog"></div></aside></div></main>
 <button id="sdt" onclick="sdToggle(true)" aria-label="チャットとログを開く"></button>
@@ -328,15 +358,19 @@ function evReset(){evSeen=-1;evQ=[];evStop()}
 function evStop(){evTm.forEach(clearTimeout);evTm=[];evBusy=false;evReady=false;const el=$('#evl');if(el){el.style.display='none';el.innerHTML='';el.onclick=null}}
 function evCheck(){
  if(!(S&&S.game==='wolf')){evSeen=-1;return}
- const e=S.ev;
- if(evSeen===-1){evSeen=e?e.n:0;return}
- if(e&&e.n>evSeen){evSeen=e.n;const ids=(e.ids||[]).slice();
-  const pl=S.players.filter(p=>!p.left||ids.includes(p.id)).map(p=>({id:p.id,name:p.name,img:p.img,color:p.color,was:p.alive||ids.includes(p.id)}));
-  evQ.push({kind:e.kind,ids,pl});
-  evPump()}}
+ const list=[S.ev,S.evW].filter(Boolean),mx=Math.max(0,...list.map(e=>e.n));
+ if(evSeen===-1){evSeen=mx;return}
+ const fresh=list.filter(e=>e.n>evSeen).sort((a,b)=>a.n-b.n);
+ if(!fresh.length)return;
+ evSeen=mx;
+ fresh.forEach(e=>{const ids=(e.ids||[]).slice();
+  const pl=S.players.filter(p=>!p.left||ids.includes(p.id)).map(p=>({id:p.id,name:p.name,img:p.img,color:p.color,role:fr(p),was:p.alive||ids.includes(p.id)}));
+  if(e.team!==undefined)evQ.push({kind:'win',team:e.team,text:e.text,ids,pl});else evQ.push({kind:e.kind,ids,pl})});
+ evPump()}
 function evPump(){if(evBusy||!evQ.length)return;evBusy=true;evPlay(evQ.shift())}
 function evAv(p,dead){return`<div class="head ${p.img?'im':''} ${dead?'dd':''}" style="--c:${wcol(p.color)};${p.img?'background-image:url('+p.img+')':''}">${p.img?'':'<i></i><i></i><b></b>'}</div>`}
 function evPlay(e){
+ if(e.kind==='win')return evPlayWin(e);
  const el=$('#evl'),exec=e.kind==='exec',vic=e.ids.map(id=>e.pl.find(p=>p.id===id)).filter(Boolean),none=!vic.length;
  evKind=e.kind;evReady=false;
  const at=(ms,f)=>evTm.push(setTimeout(f,ms));
@@ -398,17 +432,44 @@ sdWatch('#clog','c');sdWatch('#glog','l');
 if(sdMq.addEventListener)sdMq.addEventListener('change',sdLayout);else sdMq.addListener(sdLayout);
 sdLayout();
 
+
+/* 再描画してもスクロール位置が先頭に戻らないよう、横スクロール位置を保持する */
+let wgX=0;
+app.addEventListener('scroll',e=>{const el=e.target;if(el&&el.classList&&el.classList.contains('wg'))wgX=el.scrollLeft},true);
+new MutationObserver(()=>{const w=app.querySelector('.wg');if(w&&wgX&&w.scrollLeft!==wgX)w.scrollLeft=wgX}).observe(app,{childList:true,subtree:true});
+
+/* ===== 勝利演出 ===== */
+function cfHTML(d,n){const C=['#e9c46a','#e76f51','#4fb3a5','#7d9bf5','#f4f1ea'];let h='';
+ for(let i=0;i<(n||48);i++){const l=Math.random()*100,w=6+Math.random()*7,dl=Math.random()*2.2,du=2.6+Math.random()*2.4;
+  h+=`<i style="left:${l.toFixed(1)}%;width:${w.toFixed(1)}px;height:${(w*1.6).toFixed(1)}px;background:${C[i%5]};animation-delay:${(d+dl).toFixed(2)}s;animation-duration:${du.toFixed(2)}s"></i>`}
+ return`<div class="cfw">${h}</div>`}
+function evPlayWin(e){
+ const el=$('#evl'),tc=TCOL[e.team]||'#c9a227',none=!e.team,third=e.team==='第三陣営';
+ const w=e.ids.map(id=>e.pl.find(q=>q.id===id)).filter(Boolean);
+ evKind='win';evReady=false;
+ const at=(ms,f)=>evTm.push(setTimeout(f,ms));
+ const title=none?'勝者なし':e.team+'の勝利！';
+ const list=third?`<div class="wlist">${w.map(q=>`<div class="wrow">${evAv(q,false)}<div style="text-align:left"><div class="rl">${esc(RN[q.role]||'')}</div><div>${esc(q.name)}</div></div></div>`).join('')}</div>`:'';
+ el.innerHTML=`${cfHTML(.6)}<div class="evw win" id="evw" style="--ac:${tc}"><div class="wglow"></div><div class="wk">GAME SET</div><div class="wtro">${none?'💀':'🏆'}</div><div class="wt">${esc(title)}</div>${list}<div class="wsub">${esc(e.text||'')}</div><div class="evhint" id="evhint"></div></div>`;
+ el.style.display='flex';el.onclick=()=>{if(evReady)evClose()};
+ try{navigator.vibrate&&navigator.vibrate([60,40,60,40,160])}catch(x){}
+ at(2600,()=>{evReady=true;const hn=$('#evhint');if(hn)hn.textContent='タップして閉じる'});
+ at(10000,evClose)}
+/* ライアーズ・デッキの勝利表示（結果オーバーレイの中に出す） */
+function winFx(d){const nm=S.winner&&S.winner!=='（なし）'?S.winner:'';
+ return`<div class="wfx" style="--d:${d}s">${cfHTML(d)}<div class="wtro2">${nm?'🏆':'💀'}</div><div class="wnm">${nm?esc(nm):'勝者なし'}</div><div class="wsub2">${nm?'の勝利！':'全員脱落…'}</div></div>`}
+
 function endBtns(){return`<div class="row" style="justify-content:center;margin-top:10px">${S.host===me?'<button class="p" onclick="lobby()">ロビーへ戻る</button>':'<span class="sm">ホストがロビーに戻します</span>'}</div>`}
 function TL(r){const n=r.cards.length,T1=.4+n*.7+.4,T2=T1+1.2,T3=T2+1.8,T4=T3+.8;return{T1,T2,T3,T4,end:T4+2.5}}
 function ovHTML(){
- if(!S.rev)return`<div class="ov"><div class="box"><div class="tg" style="font-size:28px">🏆 ${esc(S.winner)} の勝利！</div>${endBtns()}</div></div>`;
+ if(!S.rev)return`<div class="ov"><div class="box">${winFx(0)}${endBtns()}</div></div>`;
  const r=S.rev,{T1,T2,T3,T4}=TL(r),d=x=>`style="--d:${x}s"`;
  return`<div class="ov"><div class="box"><div class="sm">${r.forced?'手札が残っているのは '+esc(r.lname)+' だけになりました':esc(r.caller)+' が '+esc(r.accused)+' に「嘘だ！」（お題：'+S.target+'）'}</div>
  <div class="cards">${r.cards.map((c,i)=>`<div class="c fc" ${d(.4+i*.7)}><span>${cn(c)}</span><i class="bk"></i></div>`).join('')}</div>
  <div class="late vd" ${d(T1)}>${r.forced?'':r.truth?'✅ 本当でした！':'❌ 嘘でした！'}</div>${r.nobonus?`<div class="late sm" ${d(T1)}>（「嘘だ！」を宣言されたので、あがりの装填数は増えません）</div>`:''}
  <div class="late" ${d(T2)}><div style="margin-top:8px">🔫 ${esc(r.lname)} がトリガーを引く…</div><div class="sm" style="font-size:14px">装填数 ${r.n}（アウト確率 1/${r.n}）</div><div style="margin:6px 0">${[...Array(r.n).keys()].map(k=>`<span class="ch ${k===r.n-1?'cur'+(r.died?' dx':''):''}" ${d(T3)}></span>`).join('')}</div></div>
  <div class="late res ${r.died?'boom':''}" ${d(T3)}>${r.died?'💥 バン！':'カチッ… セーフ'}</div>${r.died?`<div class="flash" ${d(T3)}></div>`:''}
- <div class="late" ${d(T4)}>${S.phase==='over'?`<div class="tg" style="font-size:26px">🏆 ${esc(S.winner)} の勝利！</div>${endBtns()}`:'<div class="sm" style="font-size:15px">まもなく次のラウンドが始まります…</div>'}</div></div></div>`}
+ <div class="late" ${d(T4)}>${S.phase==='over'?winFx(T4)+endBtns():'<div class="sm" style="font-size:15px">まもなく次のラウンドが始まります…</div>'}</div></div></div>`}
 function syncOverlay(){const o=$('#ovl');
  const show=S&&((S.rev&&(S.phase==='reveal'||S.phase==='over'))||(S.phase==='over'&&!S.rev));
  if(!show){clearTimeout(syncOverlay.n);clearTimeout(syncOverlay.d);if(ovKey){o.innerHTML='';ovKey=''}return}
@@ -556,7 +617,7 @@ function wstart(){act(s=>{if(s.game!=='wolf'||s.host!==me||s.phase!=='lobby'||wC
  let pool=[];for(const k in c)for(let j=0;j<(c[k]||0);j++)pool.push(k);while(pool.length<total)pool.push('villager');pool=shuffle(pool);
  const roles=pool.slice(0,N);s.center=one?pool.slice(N):[];s.comp={};pool.forEach(r=>s.comp[r]=(s.comp[r]||0)+1);
  ps.forEach((p,i)=>{p.role=roles[i];p.fin=roles[i];p.alive=true;p.pair=''});
- s.inbox={};s.act={};s.votes={};s.cands=null;s.rv=0;s.day=1;s.extUsed={};s.ext=null;s.extSec=0;s.extDay=0;s.extRes=null;s.extN=s.extN||0;s.winners=[];s.winTxt='';s.gid=(s.gid||0)+1;s.ev=null;s.phase='night';
+ s.inbox={};s.act={};s.votes={};s.cands=null;s.rv=0;s.day=1;s.extUsed={};s.ext=null;s.extSec=0;s.extDay=0;s.extRes=null;s.extN=s.extN||0;s.winners=[];s.winTxt='';s.gid=(s.gid||0)+1;s.ev=null;s.evW=null;s.phase='night';
  s.log=['── ゲーム開始（'+(one?'ワンナイト人狼':'人狼')+'・'+N+'人）'];
  const wl=ps.filter(p=>WOLF.includes(p.role));wl.forEach(p=>ib(s,p.id,'🐺 人狼仲間：'+wl.map(q=>q.name).join('、')));
  const co=shuffle(ps.filter(p=>p.role==='cowner'));for(let i=0;i<co.length;i+=2){const a=co[i],b=co[i+1];if(b){a.pair=b.id;b.pair=a.id;ib(s,a.id,'🤝 共有者の相方：'+b.name);ib(s,b.id,'🤝 共有者の相方：'+a.name)}else ib(s,a.id,'🤝 共有者の相方はいません')}
@@ -567,7 +628,10 @@ function endGame(s,team,ids,txt){s.phase='end';let w;
  if(team==='village'){w=s.players.filter(p=>TEAM.village.includes(p.role));txt='市民陣営の勝利！人狼を全滅させました'}
  else if(team==='wolf'){w=s.players.filter(p=>TEAM.wolf.includes(p.role));txt='人狼陣営の勝利！'}
  else w=s.players.filter(p=>ids.includes(p.id));
- s.winners=w.map(p=>p.id);s.winTxt=txt;rl(s,'🏆 '+txt)}
+ s.winners=w.map(p=>p.id);s.winTxt=txt;rl(s,'🏆 '+txt);evWin(s)}
+function evWin(s){const w=(s.winners||[]).map(id=>s.players.find(p=>p.id===id)).filter(Boolean);
+ const team=w.length?teamOf(fr(w[0])):'';
+ s.evN=(s.evN||0)+1;s.evW={n:s.evN,team,text:s.winTxt||'',ids:w.map(p=>p.id),t:Date.now()}}
 function evPush(s,kind,ids){s.evN=(s.evN||0)+1;s.ev={n:s.evN,kind,ids:ids||[],t:Date.now()}}
 function toDay(s){s.phase='day';s.act={};s.votes={};s.extSec=0;s.ext=null}
 function toNight(s){s.day++;s.phase='night';s.act={};s.votes={};s.cands=null;s.rv=0;rl(s,'── 第'+s.day+'夜になりました')}
@@ -603,7 +667,7 @@ function resolveOne(s){voteLine(s);const c=tally(s,null),mx=Math.max(0,...Object
  else if(wi){if(ex.some(p=>fr(p)==='wolf')){w=s.players.filter(p=>TEAM.village.includes(fr(p)));t='人狼を処刑！市民陣営の勝利！'}else{w=s.players.filter(p=>TEAM.wolf.includes(fr(p)));t='人狼を逃してしまった…人狼陣営の勝利！'}}
  else if(!ex.length){w=s.players.filter(p=>TEAM.village.includes(fr(p)));t='平和村でした！誰も処刑せず、市民陣営の勝利！'}
  else{w=s.players.filter(p=>fr(p)==='madman'&&p.alive);t='平和村なのに処刑してしまった…市民陣営の敗北'}
- s.phase='end';s.winners=w.map(p=>p.id);s.winTxt=t;rl(s,'🏆 '+t)}
+ s.phase='end';s.winners=w.map(p=>p.id);s.winTxt=t;rl(s,'🏆 '+t);evWin(s)}
 function tryAdvance(s){const al=s.players.filter(p=>p.alive);if(!al.length)return;
  if(s.phase==='night'&&al.every(p=>s.act[p.id])){if(s.mode==='one')toDayOne(s);else resolveNight(s)}
  else if(s.phase==='vote'&&al.every(p=>s.votes[p.id])){if(s.mode==='one')resolveOne(s);else resolveVote(s)}}
